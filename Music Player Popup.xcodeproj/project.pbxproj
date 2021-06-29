@@ -1,0 +1,445 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
+		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
+		916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 916DB18D25AA7D86001321B5 /* Assets.xcassets */; };
+		91A756A02667081800181D8C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A7569F2667081800181D8C /* Track.swift */; };
+		91A756A62667B26900181D8C /* NSAppleScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A756A52667B26900181D8C /* NSAppleScript.swift */; };
+		91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */; };
+		91ABBCCA268A0C6D00D19910 /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCC9268A0C6D00D19910 /* Animation.swift */; };
+		91ABBCCC268A0EAD00D19910 /* CGFloat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* CGFloat.swift */; };
+		91BD537D25AF24580080C788 /* VisualEffects in Frameworks */ = {isa = PBXBuildFile; productRef = 91BD537C25AF24580080C788 /* VisualEffects */; };
+		91BD538025AF8A3F0080C788 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BD537F25AF8A3F0080C788 /* Player.swift */; };
+		91C02962266E2F4E00742AAF /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 91C02961266E2F4E00742AAF /* KeyboardShortcuts */; };
+		91DAB58E26361D9D0043F7F7 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		916DB18625AA7D84001321B5 /* Music Player Popup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Music Player Popup.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		916DB18925AA7D84001321B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		916DB18B25AA7D84001321B5 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
+		916DB18D25AA7D86001321B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		916DB19225AA7D86001321B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		91A7569F2667081800181D8C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		91A756A52667B26900181D8C /* NSAppleScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScript.swift; sourceTree = "<group>"; };
+		91A756A92667C4A700181D8C /* Music Player Popup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Music Player Popup.entitlements"; sourceTree = "<group>"; };
+		91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleEventDescriptor.swift; sourceTree = "<group>"; };
+		91ABBCC9268A0C6D00D19910 /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
+		91ABBCCB268A0EAD00D19910 /* CGFloat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloat.swift; sourceTree = "<group>"; };
+		91BD537F25AF8A3F0080C788 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		916DB18325AA7D84001321B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				91DAB58E26361D9D0043F7F7 /* LaunchAtLogin in Frameworks */,
+				91BD537D25AF24580080C788 /* VisualEffects in Frameworks */,
+				91C02962266E2F4E00742AAF /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		916DB17D25AA7D84001321B5 = {
+			isa = PBXGroup;
+			children = (
+				916DB18825AA7D84001321B5 /* Music Player Popup */,
+				916DB18725AA7D84001321B5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		916DB18725AA7D84001321B5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				916DB18625AA7D84001321B5 /* Music Player Popup.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		916DB18825AA7D84001321B5 /* Music Player Popup */ = {
+			isa = PBXGroup;
+			children = (
+				91A756A92667C4A700181D8C /* Music Player Popup.entitlements */,
+				919056ED266700D800C6096A /* Extensions */,
+				916DB18925AA7D84001321B5 /* AppDelegate.swift */,
+				916DB18B25AA7D84001321B5 /* PopoverView.swift */,
+				91BD537F25AF8A3F0080C788 /* Player.swift */,
+				91A7569F2667081800181D8C /* Track.swift */,
+				916DB18D25AA7D86001321B5 /* Assets.xcassets */,
+				916DB19225AA7D86001321B5 /* Info.plist */,
+			);
+			path = "Music Player Popup";
+			sourceTree = "<group>";
+		};
+		919056ED266700D800C6096A /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */,
+				91A756A52667B26900181D8C /* NSAppleScript.swift */,
+				91ABBCC9268A0C6D00D19910 /* Animation.swift */,
+				91ABBCCB268A0EAD00D19910 /* CGFloat.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		916DB18525AA7D84001321B5 /* Music Player Popup */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 916DB19625AA7D86001321B5 /* Build configuration list for PBXNativeTarget "Music Player Popup" */;
+			buildPhases = (
+				916DB18225AA7D84001321B5 /* Sources */,
+				916DB18325AA7D84001321B5 /* Frameworks */,
+				916DB18425AA7D84001321B5 /* Resources */,
+				91DAB59026361DCA0043F7F7 /* Copy Launch at Login Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Music Player Popup";
+			packageProductDependencies = (
+				91BD537C25AF24580080C788 /* VisualEffects */,
+				91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */,
+				91C02961266E2F4E00742AAF /* KeyboardShortcuts */,
+			);
+			productName = mpdPopup;
+			productReference = 916DB18625AA7D84001321B5 /* Music Player Popup.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		916DB17E25AA7D84001321B5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1230;
+				LastUpgradeCheck = 1240;
+				TargetAttributes = {
+					916DB18525AA7D84001321B5 = {
+						CreatedOnToolsVersion = 12.3;
+					};
+				};
+			};
+			buildConfigurationList = 916DB18125AA7D84001321B5 /* Build configuration list for PBXProject "Music Player Popup" */;
+			compatibilityVersion = "Xcode 12.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 916DB17D25AA7D84001321B5;
+			packageReferences = (
+				91BD537B25AF24580080C788 /* XCRemoteSwiftPackageReference "VisualEffects" */,
+				91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
+				91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+			);
+			productRefGroup = 916DB18725AA7D84001321B5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				916DB18525AA7D84001321B5 /* Music Player Popup */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		916DB18425AA7D84001321B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		91DAB59026361DCA0043F7F7 /* Copy Launch at Login Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Launch at Login Helper";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILT_PRODUCTS_DIR}/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/copy-helper-swiftpm.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		916DB18225AA7D84001321B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */,
+				91A756A02667081800181D8C /* Track.swift in Sources */,
+				91A756A62667B26900181D8C /* NSAppleScript.swift in Sources */,
+				91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */,
+				916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */,
+				91ABBCCA268A0C6D00D19910 /* Animation.swift in Sources */,
+				91BD538025AF8A3F0080C788 /* Player.swift in Sources */,
+				91ABBCCC268A0EAD00D19910 /* CGFloat.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		916DB19425AA7D86001321B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		916DB19525AA7D86001321B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		916DB19725AA7D86001321B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Music Player Popup/Music Player Popup.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = NO;
+				INFOPLIST_FILE = "Music Player Popup/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		916DB19825AA7D86001321B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Music Player Popup/Music Player Popup.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = NO;
+				INFOPLIST_FILE = "Music Player Popup/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		916DB18125AA7D84001321B5 /* Build configuration list for PBXProject "Music Player Popup" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				916DB19425AA7D86001321B5 /* Debug */,
+				916DB19525AA7D86001321B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		916DB19625AA7D86001321B5 /* Build configuration list for PBXNativeTarget "Music Player Popup" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				916DB19725AA7D86001321B5 /* Debug */,
+				916DB19825AA7D86001321B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		91BD537B25AF24580080C788 /* XCRemoteSwiftPackageReference "VisualEffects" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twostraws/VisualEffects";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.3;
+			};
+		};
+		91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+		91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		91BD537C25AF24580080C788 /* VisualEffects */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91BD537B25AF24580080C788 /* XCRemoteSwiftPackageReference "VisualEffects" */;
+			productName = VisualEffects;
+		};
+		91C02961266E2F4E00742AAF /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
+			productName = LaunchAtLogin;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 916DB17E25AA7D84001321B5 /* Project object */;
+}
