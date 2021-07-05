@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class Track: CustomStringConvertible, Equatable {
+struct Track: CustomStringConvertible, Equatable {
 	let artist: String
 	let name: String
 	let duration: CGFloat
@@ -25,7 +25,7 @@ class Track: CustomStringConvertible, Equatable {
 		self.artwork = nil
 	}
 
-	convenience init?(fromList list: [Int: String]) {
+	init?(fromList list: [Int: String]) {
 		self.init(
 			artist: list[1] ?? "-",
 			name: list[2] ?? "-",

@@ -8,64 +8,15 @@
 import SwiftUI
 
 final class Player: ObservableObject {
-	// TODO: Defaults here?
+	@Published var track: Track?
 	@Published var isPlaying = false
 	@Published var playerPosition: CGFloat?
 	@Published var isShuffle = false
-	@Published var track: Track?
 
 	init() {
-		// Start a timer that repeats every second, updating our values.
 		Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
 			self.updateProperties(all: AppDelegate.instance.popover.isShown)
 		})
-	}
-
-	private func isRunning() -> Bool {
-		let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music")
-
-		if apps.count >= 1 {
-			return !apps[0].self.isTerminated
-		}
-		return false
-	}
-
-	private func updateProperty<T: Equatable>(_ variable: inout T, value: T) {
-		if variable != value { variable = value }
-	}
-	
-	private func resetProperties() {
-		self.isPlaying = false
-		self.track = nil
-		self.playerPosition = 0
-		
-		AppDelegate.instance.setStatusItemTitle(nil)
-	}
-
-	func updateIsPlaying() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerState.rawValue) { success, output, _ in
-			guard success else { return }
-
-			self.updateProperty(&self.isPlaying, value: output!.stringValue == "playing")
-		}
-	}
-	
-	func updatePlayerPosition() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerPosition.rawValue) { success, output, _ in
-			guard success else { return }
-				
-			var newPosition = Double(output!.stringValue ?? "0") ?? 0
-			newPosition.round(.down)
-			self.updateProperty(&self.playerPosition, value: CGFloat(newPosition))
-		}
-	}
-	
-	func updateIsShuffle() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetIfShuffleIsEnabled.rawValue) { success, output, _ in
-			guard success else { return }
-				
-			self.updateProperty(&self.isShuffle, value: output!.stringValue == "true")
-		}
 	}
 
 	// TODO: Could probably be a little bit more elegant.
@@ -73,7 +24,7 @@ final class Player: ObservableObject {
 		NSAppleScript.run(code: NSAppleScript.snippets.GetTrackProperties.rawValue) { success, output, _ in
 			guard success else { return }
 			
-			let newTrack = Track(fromList: output!.listItems())
+			var newTrack = Track(fromList: output!.listItems())
 			let isDifferent = self.track != newTrack
 
 			if withArtwork {
@@ -110,11 +61,37 @@ final class Player: ObservableObject {
 			}
 		}
 	}
+
+	func updateIsPlaying() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerState.rawValue) { success, output, _ in
+			guard success else { return }
+
+			self.updateProperty(&self.isPlaying, value: output!.stringValue == "playing")
+		}
+	}
+	
+	func updatePlayerPosition() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerPosition.rawValue) { success, output, _ in
+			guard success else { return }
+				
+			var newPosition = Double(output!.stringValue ?? "0") ?? 0
+			newPosition.round(.down)
+			self.updateProperty(&self.playerPosition, value: CGFloat(newPosition))
+		}
+	}
+	
+	func updateIsShuffle() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetIfShuffleIsEnabled.rawValue) { success, output, _ in
+			guard success else { return }
+				
+			self.updateProperty(&self.isShuffle, value: output!.stringValue == "true")
+		}
+	}
 	
 	func updateIsLoved() {
 		NSAppleScript.run(code: NSAppleScript.snippets.GetIfTrackIsLoved.rawValue) { success, output, _ in
-			guard success && self.track != nil else { return }
-				
+			guard success, self.track != nil else { return }
+
 			self.updateProperty(&self.track!.isLoved, value: output!.stringValue == "true")
 		}
 	}
@@ -183,5 +160,26 @@ final class Player: ObservableObject {
 		if AppDelegate.instance.popover.isShown {
 			self.updateIsLoved()
 		}
+	}
+
+	private func isRunning() -> Bool {
+		let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music")
+
+		if apps.count >= 1 {
+			return !apps[0].self.isTerminated
+		}
+		return false
+	}
+
+	private func updateProperty<T: Equatable>(_ variable: inout T, value: T) {
+		if variable != value { variable = value }
+	}
+	
+	private func resetProperties() {
+		self.isPlaying = false
+		self.track = nil
+		self.playerPosition = 0
+		
+		AppDelegate.instance.setStatusItemTitle(nil)
 	}
 }

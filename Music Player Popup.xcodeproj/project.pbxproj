@@ -28,6 +28,8 @@
 		916DB18B25AA7D84001321B5 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		916DB18D25AA7D86001321B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		916DB19225AA7D86001321B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		919E4EEC26939DBA0001B272 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		919E4EED2693AA060001B272 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		91A7569F2667081800181D8C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		91A756A52667B26900181D8C /* NSAppleScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScript.swift; sourceTree = "<group>"; };
 		91A756A92667C4A700181D8C /* Music Player Popup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Music Player Popup.entitlements"; sourceTree = "<group>"; };
@@ -53,6 +55,8 @@
 		916DB17D25AA7D84001321B5 = {
 			isa = PBXGroup;
 			children = (
+				919E4EED2693AA060001B272 /* LICENSE.md */,
+				919E4EEC26939DBA0001B272 /* README.md */,
 				916DB18825AA7D84001321B5 /* Music Player Popup */,
 				916DB18725AA7D84001321B5 /* Products */,
 			);

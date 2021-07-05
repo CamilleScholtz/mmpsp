@@ -14,7 +14,7 @@ struct PopoverView: View {
 	@State private var hover = false
 	@State private var info = false
 	@State private var infoDelay = false
-	@State private var angle = CGFloat(-4)
+	@State private var angle = CGFloat(-3)
 	@State private var timer: Timer?
 
 	var body: some View {
@@ -24,18 +24,18 @@ struct PopoverView: View {
 			Artwork()
 				.cornerRadius(10)
 				.rotationEffect(Angle(degrees: info ? angle : 0))
-				.animation(Animation.easeInOut(duration: 4), value: infoDelay)
-				.animation(Animation.easeInOut(duration: 4), value: angle)
+				.animation(.easeInOut(duration: 4), value: infoDelay)
+				.animation(.easeInOut(duration: 4), value: angle)
 				.scaleEffect(info ? 0.7 : 1)
 				.offset(y: info ? -7 : 0)
-				.animation(Animation.easeInOut(duration: 0.5), value: info)
+				.animation(.spring(response: 1, dampingFraction: 1, blendDuration: 1), value: info)
 				.shadow(color: .black.opacity(0.2), radius: 10)
 				.background(.ultraThinMaterial)
 
 			Footer()
 				.frame(height: 80)
 				.offset(y: infoDelay ? 0 : 80)
-				.animation(Animation.interactiveSpring(), value: infoDelay)
+				.animation(.spring(), value: infoDelay)
 		}
 		.mask(
 			RadialGradient(
@@ -181,6 +181,7 @@ struct Progress: View {
 					)
 					.blendMode(.softLight)
 			}
+			.animation(.spring(), value: player.playerPosition)
 			.gesture(DragGesture(minimumDistance: 0).onChanged { value in
 				player.setPosition((value.location.x / 250) * (player.track?.duration ?? 100))
 			})
@@ -199,7 +200,7 @@ struct Progress: View {
 					.offset(x: -5, y: 3)
 			}
 		}
-		.animation(Animation.interactiveSpring(), value: hover)
+		.animation(.interactiveSpring(), value: hover)
 		.onHover(perform: { value in
 			hover = value
 		})
@@ -289,7 +290,7 @@ struct Shuffle: View {
 		Image(systemName: "shuffle")
 			.foregroundColor(Color(player.isShuffle ? .systemRed : .textColor))
 			.blendMode(player.isShuffle ? .multiply : .overlay)
-			.animation(Animation.interactiveSpring(), value: player.isShuffle)
+			.animation(.interactiveSpring(), value: player.isShuffle)
 			.padding(10)
 			.scaleEffect(hover ? 1.2 : 1)
 			.animation(.interactiveSpring(), value: hover)
@@ -310,13 +311,13 @@ struct Loved: View {
 	var body: some View {
 		Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
 			.foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
-			.blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
-			.animation(Animation.interactiveSpring(), value: player.track?.isLoved)
+			.blendMode(player.track?.isLoved ?? false ? .colorDodge : .overlay)
+			.animation(.interactiveSpring(), value: player.track?.isLoved)
 			.padding(10)
 			.scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
 			.scaleEffect(hover ? 1.2 : 1)
-			.animation(Animation.interactiveSpring(), value: hover)
-			.animation(Animation.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
+			.animation(.interactiveSpring(), value: hover)
+			.animation(.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
 			.onHover(perform: { value in
 				hover = value
 			})
