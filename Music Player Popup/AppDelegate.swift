@@ -40,7 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		// TODO: `case .scrollWheel` doesn't work.
 		statusItem.button?.sendAction(on: [.leftMouseDown, .rightMouseDown])
 
-		setStatusItemTitle(player.currentTrack?.description)
+		setStatusItemTitle(player.track?.description)
 
 		popover.contentViewController = NSViewController()
 		popover.contentViewController!.view = NSHostingView(
@@ -72,6 +72,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		if popover.isShown {
 			popover.performClose(sender)
 		} else {
+			player.updateProperties(all: true)
+
 			// TODO: Always spawn on the right.
 			popover.show(
 				relativeTo: sender!.bounds,

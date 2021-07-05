@@ -8,57 +8,59 @@
 import SwiftUI
 
 extension NSAppleScript {
-	static func run(code: String, completionHandler: (Bool, NSAppleEventDescriptor?, NSDictionary?) -> Void) {
+	static func run(code: String, handler: (Bool, NSAppleEventDescriptor?, NSDictionary?) -> Void) {
 		var error: NSDictionary?
 		let script = NSAppleScript(source: code)
 		let output = script?.executeAndReturnError(&error)
 
-		if let ou = output {
-			completionHandler(true, ou, nil)
+		guard output != nil else {
+			return handler(false, nil, error)
 		}
-		else {
-			completionHandler(false, nil, error)
-		}
+		return handler(true, output, nil)
 	}
 }
 
 extension NSAppleScript {
 	enum snippets: String {
-		case GetCurrentPlayerState = """
+		case GetPlayerState = """
 		tell application "Music"
-			if it is running then
-				get player state as text
-			end if
+			get player state as text
 		end tell
 		"""
 
-		case GetCurrentPlayerPosition = """
+		case GetPlayerPosition = """
 		tell application "Music"
-			if it is running then
-				get player position
-			end if
+			get player position
 		end tell
 		"""
 
-		case GetCurrentTrackProperties = """
+		case GetTrackProperties = """
 		tell application "Music"
-			if it is running then
-				get {artist, name, duration} of current track
-			end if
+			get {artist, name, duration, loved} of current track
 		end tell
 		"""
 
-		case GetCurrentArtwork = """
+		case GetIfTrackIsLoved = """
+		tell application "Music"
+			get loved of current track
+		end tell
+		"""
+
+		case GetArtwork = """
 		tell application "Music"
 			get raw data of artwork 1 of current track
 		end tell
 		"""
 
-		case GetIfCurrentTrackIsLoved = """
+		case GetShuffleInformation = """
 		tell application "Music"
-			if it is running then
-				get loved of current track
-			end if
+			get shuffle {mode, enabled}
+		end tell
+		"""
+
+		case GetIfShuffleIsEnabled = """
+		tell application "Music"
+			get shuffle enabled
 		end tell
 		"""
 
@@ -74,46 +76,36 @@ extension NSAppleScript {
 
 		case BackTrack = """
 		tell application "Music"
-			if it is running then
-				back track
-			end if
+			back track
 		end tell
 		"""
 
 		case NextTrack = """
 		tell application "Music"
-			if it is running then
-				next track
-			end if
+			next track
 		end tell
 		"""
-
-		static func AddToPosition(_ amount: CGFloat) -> String {
-			return """
-			tell application "Music"
-				if it is running then
-					set player position to player position + \(amount)
-				end if
-			end tell
-			"""
-		}
 
 		static func SetPosition(_ position: CGFloat) -> String {
 			return """
 			tell application "Music"
-				if it is running then
-					set player position to \(position)
-				end if
+				set player position to \(position)
 			end tell
 			"""
 		}
-		
+
+		static func AddToPosition(_ amount: CGFloat) -> String {
+			return """
+			tell application "Music"
+				set player position to player position + \(amount)
+			end tell
+			"""
+		}
+
 		static func SetLoved(_ loved: Bool) -> String {
 			return """
 			tell application "Music"
-				if it is running then
-					set loved of current track to \(loved ? "true" : "false")
-				end if
+				set loved of current track to \(loved ? "true" : "false")
 			end tell
 			"""
 		}

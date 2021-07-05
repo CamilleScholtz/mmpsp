@@ -16,7 +16,7 @@ struct PopoverView: View {
 	@State private var infoDelay = false
 	@State private var angle = CGFloat(-4)
 	@State private var timer: Timer?
-	
+
 	var body: some View {
 		ZStack(alignment: .bottom) {
 			Artwork()
@@ -48,19 +48,18 @@ struct PopoverView: View {
 		)
 		.frame(width: 250, height: height)
 		.onAppear(perform: {
-			// TODO: Can I merge this with the onChange call below?
-			// TODO: maybe I should round to nearest?
-			height = (player.artwork!.size.height / player.artwork!.size.width * 250).rounded(.down)
+			guard player.track?.artwork != nil else { return height = 250 }
+			height = (player.track!.artwork!.size.height / player.track!.artwork!.size.width * 250).rounded(.down)
 		})
-		.onChange(of: player.artwork!, perform: { value in
-			// TODO: maybe I should round to nearest?
-			height = (value.size.height / value.size.width * 250).rounded(.down)
+		.onChange(of: player.track?.artwork, perform: { value in
+			guard value != nil else { return height = 250 }
+			height = (value!.size.height / value!.size.width * 250).rounded(.down)
 		})
 		.onChange(of: player.isPlaying, perform: { value in
 			if hover {
 				return
 			}
-			
+
 			info = !value
 
 			if !value {
@@ -79,9 +78,9 @@ struct PopoverView: View {
 			if !player.isPlaying {
 				return
 			}
-			
+
 			info = value
-			
+
 			if value {
 				infoDelay = true
 			} else {
@@ -94,7 +93,7 @@ struct PopoverView: View {
 		})
 		.onChange(of: infoDelay, perform: { value in
 			if value {
-				timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { timer in
+				timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
 					angle = -angle
 				}
 			} else {
@@ -108,10 +107,16 @@ struct Artwork: View {
 	@EnvironmentObject var player: Player
 
 	var body: some View {
-		Image(nsImage: player.artwork ?? NSImage()) // TODO: placeholder
-			.resizable()
-			.aspectRatio(contentMode: .fill)
-			.frame(width: 250)
+		if player.track?.artwork != nil {
+			Image(nsImage: player.track!.artwork!)
+				.resizable()
+				.aspectRatio(contentMode: .fill)
+				.frame(width: 250)
+		} else {
+			Image(systemName: "questionmark.app.dashed")
+				.font(.system(size: 50))
+				.frame(width: 250, height: 250)
+		}
 	}
 }
 
@@ -126,8 +131,9 @@ struct Footer: View {
 				Spacer()
 
 				HStack(alignment: .center) {
-					Spacer()
-					Spacer()
+					Shuffle()
+						.offset(x: 10)
+
 					Spacer()
 
 					HStack {
@@ -135,15 +141,16 @@ struct Footer: View {
 						PausePlay()
 						Next()
 					}
-					
+
 					Spacer()
-					
+
 					Loved()
 						.offset(x: -10)
 				}
 
 				Spacer()
 			}
+			.offset(y: 1)
 		}
 		.frame(height: 80)
 		.background(.ultraThinMaterial)
@@ -161,7 +168,7 @@ struct Progress: View {
 				Rectangle()
 					.fill(Color(.textColor))
 					.frame(
-						width: (player.playerPosition ?? 0) / (player.currentTrack?.duration ?? 100) * 250,
+						width: (player.playerPosition ?? 0) / (player.track?.duration ?? 100) * 250,
 						height: hover ? 8 : 4
 					)
 					.blendMode(.softLight)
@@ -169,27 +176,25 @@ struct Progress: View {
 				Rectangle()
 					.fill(Color(.textBackgroundColor))
 					.frame(
-						width: CGFloat.maximum(0, 250 - ((player.playerPosition ?? 0) / (player.currentTrack?.duration ?? 100) * 250)),
+						width: CGFloat.maximum(0, 250 - ((player.playerPosition ?? 0) / (player.track?.duration ?? 100) * 250)),
 						height: hover ? 8 : 4
 					)
 					.blendMode(.softLight)
 			}
 			.gesture(DragGesture(minimumDistance: 0).onChanged { value in
-				player.setPosition((value.location.x / 250) * (player.currentTrack?.duration ?? 100))
+				player.setPosition((value.location.x / 250) * (player.track?.duration ?? 100))
 			})
-			
+
 			HStack(alignment: .center) {
 				Text(player.playerPosition?.timeString ?? "-:--")
 					.font(.system(size: 10))
-					.foregroundColor(Color(.textColor))
 					.blendMode(.overlay)
 					.offset(x: 5, y: 3)
 
 				Spacer()
 
-				Text(player.currentTrack?.duration.timeString ?? "-:--")
+				Text(player.track?.duration.timeString ?? "-:--")
 					.font(.system(size: 10))
-					.foregroundColor(Color(.textColor))
 					.blendMode(.overlay)
 					.offset(x: -5, y: 3)
 			}
@@ -210,7 +215,6 @@ struct PausePlay: View {
 	var body: some View {
 		Image(systemName: (player.isPlaying ? "pause" : "play") + ".circle.fill")
 			.font(.system(size: 35))
-			.foregroundColor(Color(.textColor))
 			.blendMode(.overlay)
 			.scaleEffect(hover ? 1.2 : 1)
 			.animation(.interactiveSpring(), value: hover)
@@ -243,7 +247,6 @@ struct Back: View {
 
 	var body: some View {
 		Image(systemName: "backward.fill")
-			.foregroundColor(Color(.textColor))
 			.blendMode(.overlay)
 			.padding(10)
 			.scaleEffect(hover ? 1.2 : 1)
@@ -264,7 +267,6 @@ struct Next: View {
 
 	var body: some View {
 		Image(systemName: "forward.fill")
-			.foregroundColor(Color(.textColor))
 			.blendMode(.overlay)
 			.padding(10)
 			.scaleEffect(hover ? 1.2 : 1)
@@ -278,26 +280,66 @@ struct Next: View {
 	}
 }
 
+struct Shuffle: View {
+	@EnvironmentObject var player: Player
+
+	@State private var hover = false
+
+	var body: some View {
+		Image(systemName: "shuffle")
+			.foregroundColor(Color(player.isShuffle ? .systemRed : .textColor))
+			.blendMode(player.isShuffle ? .multiply : .overlay)
+			.animation(Animation.interactiveSpring(), value: player.isShuffle)
+			.padding(10)
+			.scaleEffect(hover ? 1.2 : 1)
+			.animation(.interactiveSpring(), value: hover)
+			.onHover(perform: { value in
+				hover = value
+			})
+			.onTapGesture(perform: {
+				print(player.isShuffle)
+			})
+	}
+}
+
 struct Loved: View {
 	@EnvironmentObject var player: Player
 
 	@State private var hover = false
 
 	var body: some View {
-		Image(systemName: player.loved ? "heart.fill" : "heart")
-			.foregroundColor(Color(player.loved ? .systemRed : .textColor))
-			.blendMode(player.loved ? .multiply : .overlay)
-			.animation(Animation.interactiveSpring(), value: player.loved)
+		Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
+			.foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
+			.blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
+			.animation(Animation.interactiveSpring(), value: player.track?.isLoved)
 			.padding(10)
-			.scaleEffect(player.loved ? 1.1 : 1)
+			.scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
 			.scaleEffect(hover ? 1.2 : 1)
 			.animation(Animation.interactiveSpring(), value: hover)
-			.animation(Animation.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.loved), value: player.loved)
+			.animation(Animation.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
 			.onHover(perform: { value in
 				hover = value
 			})
 			.onTapGesture(perform: {
-				player.setLoved(!player.loved)
+				player.setLoved(!(player.track?.isLoved ?? false))
+			})
+	}
+}
+
+struct Wrench: View {
+	@State private var hover = false
+
+	var body: some View {
+		Image(systemName: "wrench")
+			.blendMode(.overlay)
+			.padding(10)
+			.scaleEffect(hover ? 1.2 : 1)
+			.animation(.interactiveSpring(), value: hover)
+			.onHover(perform: { value in
+				hover = value
+			})
+			.onTapGesture(perform: {
+				print("A")
 			})
 	}
 }

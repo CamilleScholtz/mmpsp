@@ -7,15 +7,21 @@
 
 import SwiftUI
 
-class Player: ObservableObject {
+final class Player: ObservableObject {
 	// TODO: Defaults here?
 	@Published var isPlaying = false
-	@Published var currentTrack: Track?
 	@Published var playerPosition: CGFloat?
-	@Published var artwork: NSImage?
-	@Published var loved = false
+	@Published var isShuffle = false
+	@Published var track: Track?
 
-	private var isRunning: Bool {
+	init() {
+		// Start a timer that repeats every second, updating our values.
+		Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
+			self.updateProperties(all: AppDelegate.instance.popover.isShown)
+		})
+	}
+
+	private func isRunning() -> Bool {
 		let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music")
 
 		if apps.count >= 1 {
@@ -24,103 +30,158 @@ class Player: ObservableObject {
 		return false
 	}
 
-	init() {
-		Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-			self.update()
-		})
+	private func updateProperty<T: Equatable>(_ variable: inout T, value: T) {
+		if variable != value { variable = value }
+	}
+	
+	private func resetProperties() {
+		self.isPlaying = false
+		self.track = nil
+		self.playerPosition = 0
+		
+		AppDelegate.instance.setStatusItemTitle(nil)
 	}
 
-	private func updateVar<T: Equatable>(_ variable: inout T, value: T) -> Bool {
-		if variable != value {
-			variable = value
-			return true
+	func updateIsPlaying() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerState.rawValue) { success, output, _ in
+			guard success else { return }
+
+			self.updateProperty(&self.isPlaying, value: output!.stringValue == "playing")
 		}
-		return false
+	}
+	
+	func updatePlayerPosition() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerPosition.rawValue) { success, output, _ in
+			guard success else { return }
+				
+			var newPosition = Double(output!.stringValue ?? "0") ?? 0
+			newPosition.round(.down)
+			self.updateProperty(&self.playerPosition, value: CGFloat(newPosition))
+		}
+	}
+	
+	func updateIsShuffle() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetIfShuffleIsEnabled.rawValue) { success, output, _ in
+			guard success else { return }
+				
+			self.updateProperty(&self.isShuffle, value: output!.stringValue == "true")
+		}
 	}
 
-	func update() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetCurrentTrackProperties.rawValue) { success, output, _ in
-			if success {
-				if self.updateVar(&self.currentTrack, value: Track(fromList: output!.listItems())) {
-					_ = self.updateVar(&self.playerPosition, value: CGFloat(0))
+	// TODO: Could probably be a little bit more elegant.
+	func updateTrack(withArtwork: Bool) {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetTrackProperties.rawValue) { success, output, _ in
+			guard success else { return }
+			
+			let newTrack = Track(fromList: output!.listItems())
+			let isDifferent = self.track != newTrack
 
-					AppDelegate.instance.setStatusItemTitle(self.currentTrack?.description)
+			if withArtwork {
+				// TODO: Possible never ending loop with artworkless tracks.
+				if isDifferent || self.track?.artwork == nil {
+					NSAppleScript.run(code: NSAppleScript.snippets.GetArtwork.rawValue) { success, output, _ in
+						guard success else {
+							if isDifferent {
+								self.track = newTrack
+								AppDelegate.instance.setStatusItemTitle(self.track?.description)
+							}
+							
+							return
+						}
+			
+						let image = NSImage(data: output!.data)
+						
+						if isDifferent {
+							newTrack?.artwork = image
 
-					NSAppleScript.run(code: NSAppleScript.snippets.GetCurrentArtwork.rawValue) { success, output, _ in
-						if success {
-							_ = self.updateVar(&self.artwork, value: NSImage(data: output!.data))
+							self.track = newTrack
+							self.updateProperty(&self.playerPosition, value: 0)
+							AppDelegate.instance.setStatusItemTitle(self.track?.description)
 						} else {
-							self.artwork = nil
-						}
-					}
-					
-					NSAppleScript.run(code: NSAppleScript.snippets.GetIfCurrentTrackIsLoved.rawValue) { success, output, _ in
-						if success {
-							_ = self.updateVar(&self.loved, value: output!.stringValue == "true")
-						}
-					}
-				}
-
-				if AppDelegate.instance.popover.isShown {
-					NSAppleScript.run(code: NSAppleScript.snippets.GetCurrentPlayerState.rawValue) { success, output, _ in
-						if success {
-							_ = self.updateVar(&self.isPlaying, value: output!.stringValue == "playing")
-						}
-					}
-
-					NSAppleScript.run(code: NSAppleScript.snippets.GetCurrentPlayerPosition.rawValue) { success, output, _ in
-						if success {
-							var newPosition = Double(output!.stringValue ?? "0") ?? 0
-							newPosition.round(.down)
-
-							_ = self.updateVar(&self.playerPosition, value: CGFloat(newPosition))
-						}
-					}
-					
-					NSAppleScript.run(code: NSAppleScript.snippets.GetIfCurrentTrackIsLoved.rawValue) { success, output, _ in
-						if success {
-							_ = self.updateVar(&self.loved, value: output!.stringValue == "true")
+							self.track?.artwork = image
 						}
 					}
 				}
 			} else {
-				if self.currentTrack != nil {
-					self.currentTrack = nil
-					self.artwork = nil
-
-					AppDelegate.instance.setStatusItemTitle(nil)
+				if isDifferent {
+					self.track = newTrack
+					AppDelegate.instance.setStatusItemTitle(self.track?.description)
 				}
 			}
 		}
 	}
+	
+	func updateIsLoved() {
+		NSAppleScript.run(code: NSAppleScript.snippets.GetIfTrackIsLoved.rawValue) { success, output, _ in
+			guard success && self.track != nil else { return }
+				
+			self.updateProperty(&self.track!.isLoved, value: output!.stringValue == "true")
+		}
+	}
+	
+	func updateProperties(all: Bool) {
+		guard self.isRunning() else { return self.resetProperties() }
+		
+		if all {
+			self.updateTrack(withArtwork: true)
+			self.updateIsPlaying()
+			self.updatePlayerPosition()
+			self.updateIsShuffle()
+			self.updateIsLoved()
+		} else {
+			self.updateTrack(withArtwork: false)
+		}
+	}
 
 	func pausePlay() {
-		NSAppleScript.run(code: NSAppleScript.snippets.PausePlay.rawValue, completionHandler: { _, _, _ in })
-		self.update()
+		NSAppleScript.run(code: NSAppleScript.snippets.PausePlay.rawValue, handler: { _, _, _ in })
+		
+		if AppDelegate.instance.popover.isShown {
+			self.updateIsPlaying()
+		}
 	}
 
 	func backTrack() {
-		NSAppleScript.run(code: NSAppleScript.snippets.BackTrack.rawValue, completionHandler: { _, _, _ in })
-		self.update()
+		NSAppleScript.run(code: NSAppleScript.snippets.BackTrack.rawValue, handler: { _, _, _ in })
+		
+		if AppDelegate.instance.popover.isShown {
+			self.updateTrack(withArtwork: true)
+		} else {
+			self.updateTrack(withArtwork: false)
+		}
 	}
 
 	func nextTrack() {
-		NSAppleScript.run(code: NSAppleScript.snippets.NextTrack.rawValue, completionHandler: { _, _, _ in })
-		self.update()
-	}
-
-	func addToPosition(_ amount: CGFloat) {
-		NSAppleScript.run(code: NSAppleScript.snippets.AddToPosition(amount), completionHandler: { _, _, _ in })
-		self.update()
+		NSAppleScript.run(code: NSAppleScript.snippets.NextTrack.rawValue, handler: { _, _, _ in })
+		
+		if AppDelegate.instance.popover.isShown {
+			self.updateTrack(withArtwork: true)
+		} else {
+			self.updateTrack(withArtwork: false)
+		}
 	}
 
 	func setPosition(_ position: CGFloat) {
-		NSAppleScript.run(code: NSAppleScript.snippets.SetPosition(position), completionHandler: { _, _, _ in })
-		self.update()
+		NSAppleScript.run(code: NSAppleScript.snippets.SetPosition(position), handler: { _, _, _ in })
+		
+		if AppDelegate.instance.popover.isShown {
+			self.updatePlayerPosition()
+		}
+	}
+
+	func addToPosition(_ amount: CGFloat) {
+		NSAppleScript.run(code: NSAppleScript.snippets.AddToPosition(amount), handler: { _, _, _ in })
+		
+		if AppDelegate.instance.popover.isShown {
+			self.updatePlayerPosition()
+		}
 	}
 
 	func setLoved(_ loved: Bool) {
-		NSAppleScript.run(code: NSAppleScript.snippets.SetLoved(loved), completionHandler: { _, _, _ in })
-		self.update()
+		NSAppleScript.run(code: NSAppleScript.snippets.SetLoved(loved), handler: { _, _, _ in })
+	
+		if AppDelegate.instance.popover.isShown {
+			self.updateIsLoved()
+		}
 	}
 }
