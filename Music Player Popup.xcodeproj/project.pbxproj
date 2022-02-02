@@ -7,21 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9130148226A5B42100755B7D /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130148126A5B42100755B7D /* Animation.swift */; };
+		915A7CF227A48E9900B23398 /* ScriptingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF127A48E9900B23398 /* ScriptingBridge.swift */; };
+		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
 		91618A49268B7F2C0039AFBC /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91618A48268B7F2C0039AFBC /* KeyboardShortcuts.swift */; };
 		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
 		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
 		916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 916DB18D25AA7D86001321B5 /* Assets.xcassets */; };
 		91A756A02667081800181D8C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A7569F2667081800181D8C /* Track.swift */; };
-		91A756A62667B26900181D8C /* NSAppleScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A756A52667B26900181D8C /* NSAppleScript.swift */; };
 		91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */; };
-		91ABBCCC268A0EAD00D19910 /* CGFloat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* CGFloat.swift */; };
+		91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* Double.swift */; };
 		91BD538025AF8A3F0080C788 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BD537F25AF8A3F0080C788 /* Player.swift */; };
-		91C02962266E2F4E00742AAF /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 91C02961266E2F4E00742AAF /* KeyboardShortcuts */; };
-		91CF6ED52690885F0005DD0C /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91CF6ED42690885F0005DD0C /* Animation.swift */; };
-		91DAB58E26361D9D0043F7F7 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */; };
+		91DDEC4A276BCBE10083814E /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 91DDEC49276BCBE10083814E /* KeyboardShortcuts */; };
+		91DDEC4D276BCBEC0083814E /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 91DDEC4C276BCBEC0083814E /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9130148126A5B42100755B7D /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
+		915A7CF127A48E9900B23398 /* ScriptingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptingBridge.swift; sourceTree = "<group>"; };
+		915A7CF327A877ED00B23398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		91618A48268B7F2C0039AFBC /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
 		916DB18625AA7D84001321B5 /* Music Player Popup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Music Player Popup.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		916DB18925AA7D84001321B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -31,12 +35,10 @@
 		919E4EEC26939DBA0001B272 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		919E4EED2693AA060001B272 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
 		91A7569F2667081800181D8C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
-		91A756A52667B26900181D8C /* NSAppleScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleScript.swift; sourceTree = "<group>"; };
 		91A756A92667C4A700181D8C /* Music Player Popup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Music Player Popup.entitlements"; sourceTree = "<group>"; };
 		91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleEventDescriptor.swift; sourceTree = "<group>"; };
-		91ABBCCB268A0EAD00D19910 /* CGFloat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloat.swift; sourceTree = "<group>"; };
+		91ABBCCB268A0EAD00D19910 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		91BD537F25AF8A3F0080C788 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
-		91CF6ED42690885F0005DD0C /* Animation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Animation.swift; path = ../../../../../.Trash/Animation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,8 +46,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				91DAB58E26361D9D0043F7F7 /* LaunchAtLogin in Frameworks */,
-				91C02962266E2F4E00742AAF /* KeyboardShortcuts in Frameworks */,
+				91DDEC4D276BCBEC0083814E /* LaunchAtLogin in Frameworks */,
+				91DDEC4A276BCBE10083814E /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +79,8 @@
 				919056ED266700D800C6096A /* Extensions */,
 				916DB18925AA7D84001321B5 /* AppDelegate.swift */,
 				916DB18B25AA7D84001321B5 /* PopoverView.swift */,
+				915A7CF327A877ED00B23398 /* SettingsView.swift */,
+				915A7CF127A48E9900B23398 /* ScriptingBridge.swift */,
 				91BD537F25AF8A3F0080C788 /* Player.swift */,
 				91A7569F2667081800181D8C /* Track.swift */,
 				916DB18D25AA7D86001321B5 /* Assets.xcassets */,
@@ -89,10 +93,9 @@
 			isa = PBXGroup;
 			children = (
 				91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */,
-				91CF6ED42690885F0005DD0C /* Animation.swift */,
-				91A756A52667B26900181D8C /* NSAppleScript.swift */,
 				91618A48268B7F2C0039AFBC /* KeyboardShortcuts.swift */,
-				91ABBCCB268A0EAD00D19910 /* CGFloat.swift */,
+				91ABBCCB268A0EAD00D19910 /* Double.swift */,
+				9130148126A5B42100755B7D /* Animation.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -115,8 +118,8 @@
 			);
 			name = "Music Player Popup";
 			packageProductDependencies = (
-				91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */,
-				91C02961266E2F4E00742AAF /* KeyboardShortcuts */,
+				91DDEC49276BCBE10083814E /* KeyboardShortcuts */,
+				91DDEC4C276BCBEC0083814E /* LaunchAtLogin */,
 			);
 			productName = mpdPopup;
 			productReference = 916DB18625AA7D84001321B5 /* Music Player Popup.app */;
@@ -146,8 +149,8 @@
 			);
 			mainGroup = 916DB17D25AA7D84001321B5;
 			packageReferences = (
-				91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
-				91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				91DDEC48276BCBE10083814E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
 			);
 			productRefGroup = 916DB18725AA7D84001321B5 /* Products */;
 			projectDirPath = "";
@@ -198,12 +201,13 @@
 				916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */,
 				91618A49268B7F2C0039AFBC /* KeyboardShortcuts.swift in Sources */,
 				91A756A02667081800181D8C /* Track.swift in Sources */,
-				91A756A62667B26900181D8C /* NSAppleScript.swift in Sources */,
 				91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */,
 				916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */,
+				915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */,
+				915A7CF227A48E9900B23398 /* ScriptingBridge.swift in Sources */,
 				91BD538025AF8A3F0080C788 /* Player.swift in Sources */,
-				91CF6ED52690885F0005DD0C /* Animation.swift in Sources */,
-				91ABBCCC268A0EAD00D19910 /* CGFloat.swift in Sources */,
+				9130148226A5B42100755B7D /* Animation.swift in Sources */,
+				91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,7 +265,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -318,7 +322,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -346,7 +350,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -371,7 +375,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -402,33 +406,33 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+		91DDEC48276BCBE10083814E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
+				branch = main;
+				kind = branch;
 			};
 		};
-		91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
+		91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		91C02961266E2F4E00742AAF /* KeyboardShortcuts */ = {
+		91DDEC49276BCBE10083814E /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 91C02960266E2F4E00742AAF /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			package = 91DDEC48276BCBE10083814E /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		91DAB58D26361D9D0043F7F7 /* LaunchAtLogin */ = {
+		91DDEC4C276BCBEC0083814E /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 91DAB58C26361D9D0043F7F7 /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
+			package = 91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
 			productName = LaunchAtLogin;
 		};
 /* End XCSwiftPackageProductDependency section */

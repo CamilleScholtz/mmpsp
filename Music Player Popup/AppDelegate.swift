@@ -13,45 +13,48 @@ import SwiftUI
 
 	var body: some Scene {
 		Settings {
-			EmptyView()
+            SettingsView()
 		}
 	}
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-	private(set) static var instance: AppDelegate!
-
+    // TODO: Move this?
 	private var player = Player()
 
 	private var statusItem: NSStatusItem!
 	var popover = NSPopover()
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
-		AppDelegate.instance = self
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(setStatusItemTitle),
+            name: NSNotification.Name("TrackChanged"),
+            object: nil)
 
-		KeyboardShortcuts.onKeyDown(for: .pausePlay) { [self] in player.pausePlay() }
-		KeyboardShortcuts.onKeyDown(for: .backTrack) { [self] in player.backTrack() }
-		KeyboardShortcuts.onKeyDown(for: .nextTrack) { [self] in player.nextTrack() }
-		KeyboardShortcuts.onKeyDown(for: .rewind) { [self] in player.addToPosition(-5) }
-		KeyboardShortcuts.onKeyDown(for: .fastForward) { [self] in player.addToPosition(5) }
+        KeyboardShortcuts.onKeyDown(for: .playPause) { [self] in player.playPause() }
+        KeyboardShortcuts.onKeyDown(for: .backTrack) { [self] in player.backTrack() }
+        KeyboardShortcuts.onKeyDown(for: .nextTrack) { [self] in player.nextTrack() }
+        KeyboardShortcuts.onKeyDown(for: .seekBackward) { [self] in player.addToPosition(-5) }
+        KeyboardShortcuts.onKeyDown(for: .seekForeward) { [self] in player.addToPosition(5) }
 
 		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 		statusItem.button?.action = #selector(buttonAction(_:))
 		// TODO: `case .scrollWheel` doesn't work.
 		statusItem.button?.sendAction(on: [.leftMouseDown, .rightMouseDown])
 
-		setStatusItemTitle(player.track?.description)
-
-		popover.contentViewController = NSViewController()
+        self.setStatusItemTitle()
+        
+        popover.contentViewController = NSViewController()
 		popover.contentViewController!.view = NSHostingView(
 			rootView: PopoverView()
 				.environmentObject(player)
 		)
 		popover.behavior = .transient
 	}
-
-	func setStatusItemTitle(_ title: String?) {
-		statusItem?.button?.title = title ?? "…"
+    
+    @objc func setStatusItemTitle() {
+        statusItem?.button?.title = player.track?.description ?? "…"
 	}
 
 	@objc func buttonAction(_ sender: NSStatusBarButton?) {
@@ -62,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		// TODO: `case .scrollWheel` doesn't work.
 		switch event.type {
 		case .rightMouseDown:
-			player.pausePlay()
+			player.playPause()
 		default:
 			togglePopover(sender)
 		}
@@ -72,9 +75,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		if popover.isShown {
 			popover.performClose(sender)
 		} else {
-			player.updateProperties(all: true)
-
 			// TODO: Always spawn on the right.
+            // https://github.com/Jaysce/Jukebox/issues/6
 			popover.show(
 				relativeTo: sender!.bounds,
 				of: sender!,

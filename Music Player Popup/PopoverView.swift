@@ -10,28 +10,34 @@ import SwiftUI
 struct PopoverView: View {
 	@EnvironmentObject var player: Player
 
-	@State private var height = CGFloat(250)
+	@State private var height = Double(250)
 	@State private var hover = false
 	@State private var info = false
 	@State private var infoDelay = false
-	@State private var angle = CGFloat(-3)
+	@State private var angle = Double(-3)
 	@State private var timer: Timer?
 
 	var body: some View {
 		ZStack(alignment: .bottom) {
 			Artwork()
-
+            
 			Artwork()
 				.cornerRadius(10)
-				.rotationEffect(Angle(degrees: info ? angle : 0))
+				.rotationEffect(.degrees(info ? angle : 0))
 				.animation(.easeInOut(duration: 4), value: infoDelay)
 				.animation(.easeInOut(duration: 4), value: angle)
 				.scaleEffect(info ? 0.7 : 1)
 				.offset(y: info ? -7 : 0)
-				.animation(.spring(response: 1, dampingFraction: 1, blendDuration: 1), value: info)
-				.shadow(color: .black.opacity(0.2), radius: 10)
+                .animation(.spring(response: 0.6, dampingFraction: 1, blendDuration: 0.8), value: info)
+				.shadow(color: .black.opacity(0.1), radius: 12)
 				.background(.ultraThinMaterial)
-
+            
+            Gear()
+                .scaleEffect(infoDelay ? 1 : 0.7)
+                .opacity(infoDelay ? 1 : 0)
+                .animation(.spring(), value: infoDelay)
+                .position(x: 235, y: 15)
+            
 			Footer()
 				.frame(height: 80)
 				.offset(y: infoDelay ? 0 : 80)
@@ -93,6 +99,7 @@ struct PopoverView: View {
 		})
 		.onChange(of: infoDelay, perform: { value in
 			if value {
+				// TODO: Maybe this impact peformance when closed popover.
 				timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
 					angle = -angle
 				}
@@ -138,7 +145,7 @@ struct Footer: View {
 
 					HStack {
 						Back()
-						PausePlay()
+                        PlayPause()
 						Next()
 					}
 
@@ -150,7 +157,7 @@ struct Footer: View {
 
 				Spacer()
 			}
-			.offset(y: 1)
+			.offset(y: 2)
 		}
 		.frame(height: 80)
 		.background(.ultraThinMaterial)
@@ -168,26 +175,27 @@ struct Progress: View {
 				Rectangle()
 					.fill(Color(.textColor))
 					.frame(
-						width: (player.playerPosition ?? 0) / (player.track?.duration ?? 100) * 250,
+						width: (player.position ?? 0) / (player.track?.duration ?? 100) * 250,
 						height: hover ? 8 : 4
 					)
 					.blendMode(.softLight)
+                    .animation(.spring(), value: player.position)
 
 				Rectangle()
 					.fill(Color(.textBackgroundColor))
 					.frame(
-						width: CGFloat.maximum(0, 250 - ((player.playerPosition ?? 0) / (player.track?.duration ?? 100) * 250)),
+						width: Double.maximum(0, 250 - ((player.position ?? 0) / (player.track?.duration ?? 100) * 250)),
 						height: hover ? 8 : 4
 					)
 					.blendMode(.softLight)
+					.animation(.spring(), value: player.position)
 			}
-			.animation(.spring(), value: player.playerPosition)
 			.gesture(DragGesture(minimumDistance: 0).onChanged { value in
 				player.setPosition((value.location.x / 250) * (player.track?.duration ?? 100))
 			})
 
 			HStack(alignment: .center) {
-				Text(player.playerPosition?.timeString ?? "-:--")
+				Text(player.position?.timeString ?? "-:--")
 					.font(.system(size: 10))
 					.blendMode(.overlay)
 					.offset(x: 5, y: 3)
@@ -207,11 +215,10 @@ struct Progress: View {
 	}
 }
 
-struct PausePlay: View {
+struct PlayPause: View {
 	@EnvironmentObject var player: Player
 
 	@State private var hover = false
-	@State private var visible = false
 
 	var body: some View {
 		Image(systemName: (player.isPlaying ? "pause" : "play") + ".circle.fill")
@@ -222,21 +229,8 @@ struct PausePlay: View {
 			.onHover(perform: { value in
 				hover = value
 			})
-			.onReceive(player.$isPlaying, perform: { value in
-				if !value {
-					visible = true
-					return
-				}
-
-				DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-					if !player.isPlaying {
-						return
-					}
-					visible = false
-				}
-			})
 			.onTapGesture(perform: {
-				player.pausePlay()
+				player.playPause()
 			})
 	}
 }
@@ -288,8 +282,8 @@ struct Shuffle: View {
 
 	var body: some View {
 		Image(systemName: "shuffle")
-			.foregroundColor(Color(player.isShuffle ? .systemRed : .textColor))
-			.blendMode(player.isShuffle ? .multiply : .overlay)
+			.foregroundColor(Color(player.isShuffle ? .textBackgroundColor : .textColor))
+			.blendMode(.overlay)
 			.animation(.interactiveSpring(), value: player.isShuffle)
 			.padding(10)
 			.scaleEffect(hover ? 1.2 : 1)
@@ -298,7 +292,7 @@ struct Shuffle: View {
 				hover = value
 			})
 			.onTapGesture(perform: {
-				print(player.isShuffle)
+				player.setShuffle(!player.isShuffle)
 			})
 	}
 }
@@ -311,7 +305,7 @@ struct Loved: View {
 	var body: some View {
 		Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
 			.foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
-			.blendMode(player.track?.isLoved ?? false ? .colorDodge : .overlay)
+			.blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
 			.animation(.interactiveSpring(), value: player.track?.isLoved)
 			.padding(10)
 			.scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
@@ -327,11 +321,11 @@ struct Loved: View {
 	}
 }
 
-struct Wrench: View {
+struct Gear: View {
 	@State private var hover = false
 
 	var body: some View {
-		Image(systemName: "wrench")
+		Image(systemName: "gear")
 			.blendMode(.overlay)
 			.padding(10)
 			.scaleEffect(hover ? 1.2 : 1)
@@ -340,7 +334,7 @@ struct Wrench: View {
 				hover = value
 			})
 			.onTapGesture(perform: {
-				print("A")
+                NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
 			})
 	}
 }

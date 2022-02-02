@@ -6,180 +6,123 @@
 //
 
 import SwiftUI
+import ScriptingBridge
 
 final class Player: ObservableObject {
 	@Published var track: Track?
 	@Published var isPlaying = false
-	@Published var playerPosition: CGFloat?
+	@Published var position: Double?
 	@Published var isShuffle = false
 
+    private var timer: Timer?
+    private var bridge: MusicApplication? = SBApplication(bundleIdentifier: "com.apple.Music")
+    private var isRunning: Bool {
+        bridge?.isRunning ?? false
+    }
+
 	init() {
-		Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-			self.updateProperties(all: AppDelegate.instance.popover.isShown)
-		})
+        DistributedNotificationCenter.default().addObserver(
+            self,
+            selector: #selector(playerStateOrTrackDidChange),
+            name: NSNotification.Name(rawValue: "com.apple.Music.playerInfo"),
+            object: nil,
+            suspensionBehavior: .deliverImmediately)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(popoverIsOpening),
+            name: NSPopover.willShowNotification,
+            object: nil)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(popoverIsClosing),
+            name: NSPopover.didCloseNotification,
+            object: nil)
+
+        playerStateOrTrackDidChange(nil)
 	}
 
-	// TODO: Could probably be a little bit more elegant.
-	func updateTrack(withArtwork: Bool) {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetTrackProperties.rawValue) { success, output, _ in
-			guard success else { return }
-			
-			var newTrack = Track(fromList: output!.listItems())
-			let isDifferent = self.track != newTrack
+    @objc func playerStateOrTrackDidChange(_ sender: NSNotification?) {
+        guard isRunning, sender?.userInfo?["Player State"] as? String != "Stopped" else {
+            resetProperties()
 
-			if withArtwork {
-				// TODO: Possible never ending loop with artworkless tracks.
-				if isDifferent || self.track?.artwork == nil {
-					NSAppleScript.run(code: NSAppleScript.snippets.GetArtwork.rawValue) { success, output, _ in
-						guard success else {
-							if isDifferent {
-								self.track = newTrack
-								AppDelegate.instance.setStatusItemTitle(self.track?.description)
-							}
-							
-							return
-						}
-			
-						let image = NSImage(data: output!.data)
-						
-						if isDifferent {
-							newTrack?.artwork = image
+            // TODO: SHould I do this in DispatchQueue.main.async?
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "TrackChanged"), object: track)
+            
+            return
+        }
 
-							self.track = newTrack
-							self.updateProperty(&self.playerPosition, value: 0)
-							AppDelegate.instance.setStatusItemTitle(self.track?.description)
-						} else {
-							self.track?.artwork = image
-						}
-					}
-				}
-			} else {
-				if isDifferent {
-					self.track = newTrack
-					AppDelegate.instance.setStatusItemTitle(self.track?.description)
-				}
-			}
-		}
-	}
+        // TODO: .artworks causes some albums to crash.
+        let newTrack = Track(
+            artist: bridge?.currentTrack?.artist,
+            name: bridge?.currentTrack?.name,
+            duration: bridge?.currentTrack?.duration ?? Double(0),
+            isLoved: bridge?.currentTrack?.loved ?? false,
+            artwork: (bridge?.currentTrack?.artworks?()[0] as! MusicArtwork).data)
 
-	func updateIsPlaying() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerState.rawValue) { success, output, _ in
-			guard success else { return }
+        updateProperty(&track, value: newTrack)
+        updateProperty(&isPlaying, value: bridge?.playerState == .playing)
+ 
+        // TODO: SHould I do this in DispatchQueue.main.async?
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "TrackChanged"), object: track)
+    }
 
-			self.updateProperty(&self.isPlaying, value: output!.stringValue == "playing")
-		}
-	}
-	
-	func updatePlayerPosition() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetPlayerPosition.rawValue) { success, output, _ in
-			guard success else { return }
-				
-			var newPosition = Double(output!.stringValue ?? "0") ?? 0
-			newPosition.round(.down)
-			self.updateProperty(&self.playerPosition, value: CGFloat(newPosition))
-		}
-	}
-	
-	func updateIsShuffle() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetIfShuffleIsEnabled.rawValue) { success, output, _ in
-			guard success else { return }
-				
-			self.updateProperty(&self.isShuffle, value: output!.stringValue == "true")
-		}
-	}
-	
-	func updateIsLoved() {
-		NSAppleScript.run(code: NSAppleScript.snippets.GetIfTrackIsLoved.rawValue) { success, output, _ in
-			guard success, self.track != nil else { return }
+    @objc func popoverIsOpening(_ sender: NSNotification?) {
+        position = bridge?.playerPosition
 
-			self.updateProperty(&self.track!.isLoved, value: output!.stringValue == "true")
-		}
-	}
-	
-	func updateProperties(all: Bool) {
-		guard self.isRunning() else { return self.resetProperties() }
-		
-		if all {
-			self.updateTrack(withArtwork: true)
-			self.updateIsPlaying()
-			self.updatePlayerPosition()
-			self.updateIsShuffle()
-			self.updateIsLoved()
-		} else {
-			self.updateTrack(withArtwork: false)
-		}
-	}
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            self.position = self.bridge?.playerPosition
+        }
+    }
 
-	func pausePlay() {
-		NSAppleScript.run(code: NSAppleScript.snippets.PausePlay.rawValue, handler: { _, _, _ in })
-		
-		if AppDelegate.instance.popover.isShown {
-			self.updateIsPlaying()
-		}
+    @objc func popoverIsClosing(_ sender: NSNotification?) {
+        timer?.invalidate()
+    }
+
+	func playPause() {
+        bridge?.playpause?()
 	}
 
 	func backTrack() {
-		NSAppleScript.run(code: NSAppleScript.snippets.BackTrack.rawValue, handler: { _, _, _ in })
-		
-		if AppDelegate.instance.popover.isShown {
-			self.updateTrack(withArtwork: true)
-		} else {
-			self.updateTrack(withArtwork: false)
-		}
+        bridge?.backTrack?()
 	}
 
 	func nextTrack() {
-		NSAppleScript.run(code: NSAppleScript.snippets.NextTrack.rawValue, handler: { _, _, _ in })
-		
-		if AppDelegate.instance.popover.isShown {
-			self.updateTrack(withArtwork: true)
-		} else {
-			self.updateTrack(withArtwork: false)
-		}
+        bridge?.nextTrack?()
 	}
 
-	func setPosition(_ position: CGFloat) {
-		NSAppleScript.run(code: NSAppleScript.snippets.SetPosition(position), handler: { _, _, _ in })
-		
-		if AppDelegate.instance.popover.isShown {
-			self.updatePlayerPosition()
-		}
+	func setPosition(_ to: Double) {
+        bridge?.setPlayerPosition?(to)
+
+        position = bridge?.playerPosition
 	}
 
-	func addToPosition(_ amount: CGFloat) {
-		NSAppleScript.run(code: NSAppleScript.snippets.AddToPosition(amount), handler: { _, _, _ in })
-		
-		if AppDelegate.instance.popover.isShown {
-			self.updatePlayerPosition()
-		}
+	func addToPosition(_ amount: Double) {
+        bridge?.setPlayerPosition?(bridge?.playerPosition ?? 0 + amount)
+
+        position = bridge?.playerPosition
 	}
 
-	func setLoved(_ loved: Bool) {
-		NSAppleScript.run(code: NSAppleScript.snippets.SetLoved(loved), handler: { _, _, _ in })
-	
-		if AppDelegate.instance.popover.isShown {
-			self.updateIsLoved()
-		}
+	func setShuffle(_ to: Bool) {
+        bridge?.setShuffleEnabled?(to)
+
+        isShuffle = to
 	}
 
-	private func isRunning() -> Bool {
-		let apps = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music")
+	func setLoved(_ to: Bool) {
+        bridge?.currentTrack?.setLoved?(to)
 
-		if apps.count >= 1 {
-			return !apps[0].self.isTerminated
-		}
-		return false
+        track?.isLoved = to
 	}
 
 	private func updateProperty<T: Equatable>(_ variable: inout T, value: T) {
 		if variable != value { variable = value }
 	}
-	
+
 	private func resetProperties() {
-		self.isPlaying = false
-		self.track = nil
-		self.playerPosition = 0
-		
-		AppDelegate.instance.setStatusItemTitle(nil)
-	}
+        track = nil
+        isPlaying = false
+        position = 0
+    }
 }

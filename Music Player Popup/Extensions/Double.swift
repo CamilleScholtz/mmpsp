@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension CGFloat {
+extension Double {
 	var timeString: String {
 		var minutes = self / 60
 		minutes.round(.down)
