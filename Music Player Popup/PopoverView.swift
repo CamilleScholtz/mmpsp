@@ -14,18 +14,24 @@ struct PopoverView: View {
 	@State private var hover = false
 	@State private var info = false
 	@State private var infoDelay = false
-	@State private var angle = Double(-3)
+    @State private var orientation = Orientations.center
 	@State private var timer: Timer?
 
+    private enum Orientations: Double {
+        case left = -3
+        case center = 0
+        case right = 3
+    }
+    
 	var body: some View {
 		ZStack(alignment: .bottom) {
 			Artwork()
             
 			Artwork()
 				.cornerRadius(10)
-				.rotationEffect(.degrees(info ? angle : 0))
+                .rotationEffect(.degrees(orientation.rawValue))
 				.animation(.easeInOut(duration: 4), value: infoDelay)
-				.animation(.easeInOut(duration: 4), value: angle)
+                .animation(.easeInOut(duration: 4), value: orientation.rawValue)
 				.scaleEffect(info ? 0.7 : 1)
 				.offset(y: info ? -7 : 0)
                 .animation(.spring(response: 0.6, dampingFraction: 1, blendDuration: 0.8), value: info)
@@ -98,13 +104,14 @@ struct PopoverView: View {
 			}
 		})
 		.onChange(of: infoDelay, perform: { value in
-			if value {
-				// TODO: Maybe this impact peformance when closed popover.
+            if value {
 				timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
-					angle = -angle
+                    orientation = orientation == Orientations.right ? Orientations.left : Orientations.right
 				}
 			} else {
 				timer?.invalidate()
+                
+                orientation = Orientations.center
 			}
 		})
 	}

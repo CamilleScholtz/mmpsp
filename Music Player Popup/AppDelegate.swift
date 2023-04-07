@@ -5,12 +5,16 @@
 //  Created by Camille Scholtz on 10/01/2021.
 //
 
-import KeyboardShortcuts
 import SwiftUI
+import LaunchAtLogin
 
 @main struct MusicPlayerPopupApp: App {
 	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+    init() {
+        LaunchAtLogin.migrateIfNeeded()
+    }
+    
 	var body: some Scene {
 		Settings {
             SettingsView()
@@ -31,12 +35,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             selector: #selector(setStatusItemTitle),
             name: NSNotification.Name("TrackChanged"),
             object: nil)
-
-        KeyboardShortcuts.onKeyDown(for: .playPause) { [self] in player.playPause() }
-        KeyboardShortcuts.onKeyDown(for: .backTrack) { [self] in player.backTrack() }
-        KeyboardShortcuts.onKeyDown(for: .nextTrack) { [self] in player.nextTrack() }
-        KeyboardShortcuts.onKeyDown(for: .seekBackward) { [self] in player.addToPosition(-5) }
-        KeyboardShortcuts.onKeyDown(for: .seekForeward) { [self] in player.addToPosition(5) }
 
 		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 		statusItem.button?.action = #selector(buttonAction(_:))

@@ -1,25 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "KeyboardShortcuts",
-        "repositoryURL": "https://github.com/sindresorhus/KeyboardShortcuts",
-        "state": {
-          "branch": "main",
-          "revision": "3017db0d96ccc7f5306037826d6eaaa4e3683cf3",
-          "version": null
-        }
-      },
-      {
-        "package": "LaunchAtLogin",
-        "repositoryURL": "https://github.com/sindresorhus/LaunchAtLogin",
-        "state": {
-          "branch": "main",
-          "revision": "e8171b3e38a2816f579f58f3dac1522aa39efe41",
-          "version": null
-        }
+  "pins" : [
+    {
+      "identity" : "launchatlogin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/LaunchAtLogin",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7ad6331f9c38953eb1ce8737758e18f7607e984a"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }

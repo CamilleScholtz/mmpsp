@@ -13,7 +13,8 @@ final class Player: ObservableObject {
 	@Published var isPlaying = false
 	@Published var position: Double?
 	@Published var isShuffle = false
-
+    @Published var popoverIsOpen = false
+    
     private var timer: Timer?
     private var bridge: MusicApplication? = SBApplication(bundleIdentifier: "com.apple.Music")
     private var isRunning: Bool {
@@ -70,6 +71,7 @@ final class Player: ObservableObject {
 
     @objc func popoverIsOpening(_ sender: NSNotification?) {
         position = bridge?.playerPosition
+        popoverIsOpen = true
 
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
             self.position = self.bridge?.playerPosition
