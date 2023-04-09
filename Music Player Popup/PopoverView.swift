@@ -331,7 +331,20 @@ struct Gear: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+                let settingsWindow = NSWindow(
+                    contentRect: NSRect(x: 0, y: 0, width: 250, height: 250),
+                    styleMask: [.titled, .closable],
+                    backing: .buffered, defer: false
+                )
+
+                let hostingController = NSHostingController(rootView: SettingsView())
+
+                settingsWindow.contentViewController = hostingController
+                settingsWindow.makeKeyAndOrderFront(nil)
+                settingsWindow.center()
+                settingsWindow.title = "Settings"
+                NSApp.activate(ignoringOtherApps: true)
+                NSApplication.shared.runModal(for: settingsWindow)
             })
     }
 }

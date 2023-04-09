@@ -10,15 +10,12 @@ import SwiftUI
 
 struct SettingsView: View {    
     var body: some View {
-        TabView {
+        ZStack {
             Form {
                 LaunchAtLogin.Toggle()
             }
-            .tabItem {
-                Label("General", systemImage: "gear")
-            }
         }
         .padding(20)
-        .frame(width: 350, height: 400)
+        .frame(width: 250, height: 250)
     }
 }
