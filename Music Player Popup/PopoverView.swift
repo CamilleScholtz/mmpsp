@@ -11,16 +11,11 @@ struct PopoverView: View {
     @EnvironmentObject var player: Player
     
     @State private var height = Double(250)
-    @State private var hover = false
+    @State private var isHovering = false
     @State private var showInfo = false
-    @State private var orientation = Orientations.center
-    @State private var timer: Timer?
-    
-    private enum Orientations: Double {
-        case left = -3
-        case center = 0
-        case right = 3
-    }
+    @State private var cursorPosition: CGPoint = .zero
+    @State private var rotationX: Double = 0
+    @State private var rotationY: Double = 0
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -28,11 +23,19 @@ struct PopoverView: View {
             
             Artwork()
                 .cornerRadius(10)
-                .rotationEffect(.degrees(orientation.rawValue))
-                .animation(.easeInOut(duration: 4), value: showInfo)
-                .animation(.easeInOut(duration: 4), value: orientation.rawValue)
+                .rotation3DEffect(
+                    Angle(degrees: rotationX),
+                    axis: (x: 1.0, y: 0.0, z: 0.0)
+                )
+                .rotation3DEffect(
+                    Angle(degrees: rotationY),
+                    axis: (x: 0.0, y: 1.0, z: 0.0)
+                )
+                .animation(.spring(), value: rotationX)
+                .animation(.spring(), value: rotationY)
                 .scaleEffect(showInfo ? 0.7 : 1)
                 .offset(y: showInfo ? -7 : 0)
+                .animation(.easeInOut(duration: 1), value: showInfo)
                 .animation(.spring(response: 0.6, dampingFraction: 1, blendDuration: 0.8), value: showInfo)
                 .shadow(color: .black.opacity(0.1), radius: 12)
                 .background(.ultraThinMaterial)
@@ -60,25 +63,52 @@ struct PopoverView: View {
         .frame(width: 250, height: height)
         .onAppear {
             updateHeight()
+
+            var lastFireTime: DispatchTime = .now()
+            let debounceInterval: TimeInterval = 0.1
+
+            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
+                let now = DispatchTime.now()
+
+                guard now > lastFireTime + debounceInterval, isHovering else {
+                    return event
+                }
+
+                var location = event.locationInWindow
+                
+                if event.window == nil {
+                    guard let frame = NSApp.keyWindow?.frame else {
+                        return event
+                    }
+                    
+                    location = CGPoint(
+                        x: location.x - frame.origin.x,
+                        y: location.y - frame.origin.y
+                    )
+                }
+
+                let xPercentage = Double(location.x / 250)
+                let yPercentage = Double(location.y / height)
+
+                rotationX = (yPercentage - 0.5) * -16
+                rotationY = (xPercentage - 0.5) * 16
+
+                lastFireTime = now
+
+                return event
+            }
         }
         .onChange(of: player.track?.artwork) { value in
             updateHeight()
         }
-        .onChange(of: player.isPlaying) { value in
-            updateShowInfo(hover: hover, isPlaying: value)
-        }
         .onHover { value in
-            hover = value
-            updateShowInfo(hover: value, isPlaying: player.isPlaying)
+            showInfo = value || !player.isPlaying
+            isHovering = value
             
             if !value {
-                withAnimation(.spring()) {
-                    orientation = Orientations.center
-                }
+                rotationX = 0
+                rotationY = 0
             }
-        }
-        .onChange(of: showInfo) { value in
-            updateOrientation(value: value)
         }
     }
     
@@ -88,22 +118,6 @@ struct PopoverView: View {
             return
         }
         height = (Double(artwork.size.height) / Double(artwork.size.width) * 250).rounded(.down)
-    }
-    
-    private func updateShowInfo(hover: Bool, isPlaying: Bool) {
-        showInfo = hover || !isPlaying
-    }
-    
-    private func updateOrientation(value: Bool) {
-        if value {
-            orientation = orientation == Orientations.right ? Orientations.left : Orientations.right
-            timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
-                orientation = orientation == Orientations.right ? Orientations.left : Orientations.right
-            }
-        } else {
-            timer?.invalidate()
-            orientation = Orientations.center
-        }
     }
 }
 

@@ -20,7 +20,6 @@ import LaunchAtLogin
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    // TODO: Move this?
     private var player = Player()
     
     private var statusItemStub: NSStatusItem!
@@ -39,10 +38,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func configureStatusItem() {
-        statusItemStub = NSStatusBar.system.statusItem(withLength: 1)
-        statusItemStub.button?.action = #selector(buttonAction(_:))
-        statusItemStub.button?.sendAction(on: [.leftMouseDown, .rightMouseDown])
-
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.action = #selector(buttonAction(_:))
         statusItem.button?.sendAction(on: [.leftMouseDown, .rightMouseDown])
@@ -54,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             selector: #selector(handleFrameChanged(_:)),
             name: NSView.frameDidChangeNotification,
             object: statusItem.button)
-        
+
         setStatusItemTitle()
     }
     
@@ -64,7 +59,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: PopoverView()
                 .environmentObject(player)
         )
-        popover.behavior = .transient
         popover.behavior = .transient
     }
     
@@ -84,7 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover.contentViewController?.view.window?.makeKey()
         }
     }
-    
+
     private func showPopover(_ sender: NSStatusBarButton?) {
         guard let sender = sender else {
             return
@@ -94,9 +88,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             origin: NSPoint(x: sender.frame.origin.x + (sender.frame.width - 75), y: sender.frame.origin.y),
             size: sender.frame.size
         )
-        
+
         if popover.isShown {
             popover.positioningRect = positioningRect
+            
+            // TODO: hack, some race issue or something
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.popover.positioningRect = positioningRect
+            }
         } else {
             popover.show(
                 relativeTo: positioningRect,
@@ -114,7 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard popover.isShown, let sender = notfication.object as? NSStatusBarButton else {
             return
         }
-        
+                
         showPopover(sender)
     }
     
