@@ -9,18 +9,18 @@ import SwiftUI
 
 struct PopoverView: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var height = Double(250)
     @State private var isHovering = false
     @State private var showInfo = false
     @State private var cursorPosition: CGPoint = .zero
     @State private var rotationX: Double = 0
     @State private var rotationY: Double = 0
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Artwork()
-            
+
             Artwork()
                 .cornerRadius(10)
                 .rotation3DEffect(
@@ -35,17 +35,16 @@ struct PopoverView: View {
                 .animation(.spring(), value: rotationY)
                 .scaleEffect(showInfo ? 0.7 : 1)
                 .offset(y: showInfo ? -7 : 0)
-                .animation(.easeInOut(duration: 1), value: showInfo)
-                .animation(.spring(response: 0.6, dampingFraction: 1, blendDuration: 0.8), value: showInfo)
-                .shadow(color: .black.opacity(0.1), radius: 12)
+                .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
+                .shadow(color: .black.opacity(0.2), radius: 16)
                 .background(.ultraThinMaterial)
-            
+
             Gear()
                 .scaleEffect(showInfo ? 1 : 0.7)
                 .opacity(showInfo ? 1 : 0)
                 .animation(.spring(), value: showInfo)
                 .position(x: 235, y: 15)
-            
+
             Footer()
                 .frame(height: 80)
                 .offset(y: showInfo ? 0 : 80)
@@ -61,11 +60,15 @@ struct PopoverView: View {
             .scaleEffect(x: 1.5)
         )
         .frame(width: 250, height: height)
-        .onAppear {
-            updateHeight()
+        .onChange(of: player.popoverIsOpen) { value in
+            guard value else {
+                return
+            }
+
+            player.song.setArtwork()
 
             var lastFireTime: DispatchTime = .now()
-            let debounceInterval: TimeInterval = 0.1
+            let debounceInterval: TimeInterval = 0.2
 
             NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
                 let now = DispatchTime.now()
@@ -75,12 +78,12 @@ struct PopoverView: View {
                 }
 
                 var location = event.locationInWindow
-                
+
                 if event.window == nil {
                     guard let frame = NSApp.keyWindow?.frame else {
                         return event
                     }
-                    
+
                     location = CGPoint(
                         x: location.x - frame.origin.x,
                         y: location.y - frame.origin.y
@@ -98,22 +101,47 @@ struct PopoverView: View {
                 return event
             }
         }
-        .onChange(of: player.track?.artwork) { value in
+        .onChange(of: player.status.state) { value in
+            showInfo = value != "play" || isHovering
+        }
+        .onChange(of: player.song.location) { _ in
+            guard player.popoverIsOpen else {
+                return
+            }
+
+            player.song.setArtwork()
+        }
+        .onChange(of: player.song.artwork) { value in
+            guard value != nil else {
+                return
+            }
+
             updateHeight()
+
+            debugPrint("Updated height")
         }
         .onHover { value in
-            showInfo = value || !player.isPlaying
+            if !value {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    if !isHovering {
+                        showInfo = false || player.status.state != "play"
+                    }
+                }
+            } else {
+                showInfo = true
+            }
+
             isHovering = value
-            
+
             if !value {
                 rotationX = 0
                 rotationY = 0
             }
         }
     }
-    
+
     private func updateHeight() {
-        guard let artwork = player.track?.artwork else {
+        guard let artwork = player.song.artwork else {
             height = 250
             return
         }
@@ -123,49 +151,43 @@ struct PopoverView: View {
 
 struct Artwork: View {
     @EnvironmentObject var player: Player
-    
+
     var body: some View {
-        if player.track?.artwork != nil {
-            Image(nsImage: player.track!.artwork!)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 250)
-        } else {
-            Image(systemName: "questionmark.app.dashed")
-                .font(.system(size: 50))
-                .frame(width: 250, height: 250)
-        }
+        Image(nsImage: player.song.artwork ?? NSImage())
+            .resizable()
+            .aspectRatio(contentMode: .fill)
+            .frame(width: 250)
     }
 }
 
 struct Footer: View {
     @EnvironmentObject var player: Player
-    
+
     var body: some View {
         ZStack(alignment: .top) {
             Progress()
-            
+
             VStack(spacing: 0) {
                 Spacer()
-                
+
                 HStack(alignment: .center) {
-                    Shuffle()
+                    Random()
                         .offset(x: 10)
-                    
+
                     Spacer()
-                    
+
                     HStack {
-                        Back()
-                        PlayPause()
+                        Previous()
+                        Pause()
                         Next()
                     }
-                    
+
                     Spacer()
-                    
-                    Loved()
-                        .offset(x: -10)
+
+//                    Loved()
+//                        .offset(x: -10)
                 }
-                
+
                 Spacer()
             }
             .offset(y: 2)
@@ -177,43 +199,43 @@ struct Footer: View {
 
 struct Progress: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var hover = false
-    
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Rectangle()
                     .fill(Color(.textColor))
                     .frame(
-                        width: (player.position ?? 0) / (player.track?.duration ?? 100) * 250,
+                        width: (player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250,
                         height: hover ? 8 : 4
                     )
                     .blendMode(.softLight)
-                    .animation(.spring(), value: player.position)
-                
+                    .animation(.spring(), value: player.status.elapsed)
+
                 Rectangle()
                     .fill(Color(.textBackgroundColor))
                     .frame(
-                        width: Double.maximum(0, 250 - ((player.position ?? 0) / (player.track?.duration ?? 100) * 250)),
+                        width: Double.maximum(0, 250 - ((player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250)),
                         height: hover ? 8 : 4
                     )
                     .blendMode(.softLight)
-                    .animation(.spring(), value: player.position)
+                    .animation(.spring(), value: player.status.elapsed)
             }
             .gesture(DragGesture(minimumDistance: 0).onChanged { value in
-                player.setPosition((value.location.x / 250) * (player.track?.duration ?? 100))
+                player.seek((value.location.x / 250) * (player.song.duration ?? 100))
             })
-            
+
             HStack(alignment: .center) {
-                Text(player.position?.timeString ?? "-:--")
+                Text(player.status.elapsed?.timeString ?? "-:--")
                     .font(.system(size: 10))
                     .blendMode(.overlay)
                     .offset(x: 5, y: 3)
-                
+
                 Spacer()
-                
-                Text(player.track?.duration.timeString ?? "-:--")
+
+                Text(player.song.duration?.timeString ?? "-:--")
                     .font(.system(size: 10))
                     .blendMode(.overlay)
                     .offset(x: -5, y: 3)
@@ -226,13 +248,14 @@ struct Progress: View {
     }
 }
 
-struct PlayPause: View {
+struct Pause: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var hover = false
-    
+    @State private var transparency: Double = 0.0
+
     var body: some View {
-        Image(systemName: (player.isPlaying ? "pause" : "play") + ".circle.fill")
+        Image(systemName: (player.status.state ?? "pause") + ".circle.fill")
             .font(.system(size: 35))
             .blendMode(.overlay)
             .scaleEffect(hover ? 1.2 : 1)
@@ -241,16 +264,16 @@ struct PlayPause: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.playPause()
+                player.pause(player.status.state == "play")
             })
     }
 }
 
-struct Back: View {
+struct Previous: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var hover = false
-    
+
     var body: some View {
         Image(systemName: "backward.fill")
             .blendMode(.overlay)
@@ -261,16 +284,16 @@ struct Back: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.backTrack()
+                player.previous()
             })
     }
 }
 
 struct Next: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var hover = false
-    
+
     var body: some View {
         Image(systemName: "forward.fill")
             .blendMode(.overlay)
@@ -281,21 +304,21 @@ struct Next: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.nextTrack()
+                player.next()
             })
     }
 }
 
-struct Shuffle: View {
+struct Random: View {
     @EnvironmentObject var player: Player
-    
+
     @State private var hover = false
-    
+
     var body: some View {
         Image(systemName: "shuffle")
-            .foregroundColor(Color(player.isShuffle ? .textBackgroundColor : .textColor))
+            .foregroundColor(Color(player.status.random ?? false ? .textBackgroundColor : .textColor))
             .blendMode(.overlay)
-            .animation(.interactiveSpring(), value: player.isShuffle)
+            .animation(.interactiveSpring(), value: player.status.random ?? false)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
             .animation(.interactiveSpring(), value: hover)
@@ -303,38 +326,38 @@ struct Shuffle: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.setShuffle(!player.isShuffle)
+                player.random(!(player.status.random ?? false))
             })
     }
 }
 
-struct Loved: View {
-    @EnvironmentObject var player: Player
-    
-    @State private var hover = false
-    
-    var body: some View {
-        Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
-            .foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
-            .blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
-            .animation(.interactiveSpring(), value: player.track?.isLoved)
-            .padding(10)
-            .scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
-            .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
-            .animation(.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
-            .onHover(perform: { value in
-                hover = value
-            })
-            .onTapGesture(perform: {
-                player.setLoved(!(player.track?.isLoved ?? false))
-            })
-    }
-}
+// struct Loved: View {
+//    @EnvironmentObject var player: Player
+//
+//    @State private var hover = false
+//
+//    var body: some View {
+//        Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
+//            .foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
+//            .blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
+//            .animation(.interactiveSpring(), value: player.track?.isLoved)
+//            .padding(10)
+//            .scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
+//            .scaleEffect(hover ? 1.2 : 1)
+//            .animation(.interactiveSpring(), value: hover)
+//            .animation(.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
+//            .onHover(perform: { value in
+//                hover = value
+//            })
+//            .onTapGesture(perform: {
+//                player.setLoved(!(player.track?.isLoved ?? false))
+//            })
+//    }
+// }
 
 struct Gear: View {
     @State private var hover = false
-    
+
     var body: some View {
         Image(systemName: "gear")
             .blendMode(.overlay)

@@ -8,22 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		9130148226A5B42100755B7D /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130148126A5B42100755B7D /* Animation.swift */; };
-		915A7CF227A48E9900B23398 /* ScriptingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF127A48E9900B23398 /* ScriptingBridge.swift */; };
 		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
+		916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E22A7ECB290074452B /* libmpdclient */; };
+		916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E52A7ED1C80074452B /* LaunchAtLogin */; };
+		916AE9E82A8047890074452B /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916AE9E72A8047890074452B /* NestedObservableObject.swift */; };
 		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
 		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
 		916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 916DB18D25AA7D86001321B5 /* Assets.xcassets */; };
-		91A756A02667081800181D8C /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A7569F2667081800181D8C /* Track.swift */; };
 		91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */; };
 		91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* Double.swift */; };
 		91BD538025AF8A3F0080C788 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BD537F25AF8A3F0080C788 /* Player.swift */; };
-		91DDEC4D276BCBEC0083814E /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 91DDEC4C276BCBEC0083814E /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9130148126A5B42100755B7D /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
-		915A7CF127A48E9900B23398 /* ScriptingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptingBridge.swift; sourceTree = "<group>"; };
 		915A7CF327A877ED00B23398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		916AE9E72A8047890074452B /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		916DB18625AA7D84001321B5 /* Music Player Popup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Music Player Popup.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		916DB18925AA7D84001321B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		916DB18B25AA7D84001321B5 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
@@ -31,7 +31,6 @@
 		916DB19225AA7D86001321B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		919E4EEC26939DBA0001B272 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		919E4EED2693AA060001B272 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
-		91A7569F2667081800181D8C /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		91A756A92667C4A700181D8C /* Music Player Popup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Music Player Popup.entitlements"; sourceTree = "<group>"; };
 		91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAppleEventDescriptor.swift; sourceTree = "<group>"; };
 		91ABBCCB268A0EAD00D19910 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
@@ -43,7 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				91DDEC4D276BCBEC0083814E /* LaunchAtLogin in Frameworks */,
+				916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */,
+				916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,9 +76,7 @@
 				916DB18925AA7D84001321B5 /* AppDelegate.swift */,
 				916DB18B25AA7D84001321B5 /* PopoverView.swift */,
 				915A7CF327A877ED00B23398 /* SettingsView.swift */,
-				915A7CF127A48E9900B23398 /* ScriptingBridge.swift */,
 				91BD537F25AF8A3F0080C788 /* Player.swift */,
-				91A7569F2667081800181D8C /* Track.swift */,
 				916DB18D25AA7D86001321B5 /* Assets.xcassets */,
 				916DB19225AA7D86001321B5 /* Info.plist */,
 			);
@@ -91,6 +89,7 @@
 				91A756AA2667CDF400181D8C /* NSAppleEventDescriptor.swift */,
 				91ABBCCB268A0EAD00D19910 /* Double.swift */,
 				9130148126A5B42100755B7D /* Animation.swift */,
+				916AE9E72A8047890074452B /* NestedObservableObject.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -112,7 +111,8 @@
 			);
 			name = "Music Player Popup";
 			packageProductDependencies = (
-				91DDEC4C276BCBEC0083814E /* LaunchAtLogin */,
+				916AE9E22A7ECB290074452B /* libmpdclient */,
+				916AE9E52A7ED1C80074452B /* LaunchAtLogin */,
 			);
 			productName = mpdPopup;
 			productReference = 916DB18625AA7D84001321B5 /* Music Player Popup.app */;
@@ -143,7 +143,8 @@
 			);
 			mainGroup = 916DB17D25AA7D84001321B5;
 			packageReferences = (
-				91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */,
+				916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */,
+				916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			productRefGroup = 916DB18725AA7D84001321B5 /* Products */;
 			projectDirPath = "";
@@ -171,13 +172,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */,
-				91A756A02667081800181D8C /* Track.swift in Sources */,
 				91A756AB2667CDF400181D8C /* NSAppleEventDescriptor.swift in Sources */,
 				916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */,
 				915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */,
-				915A7CF227A48E9900B23398 /* ScriptingBridge.swift in Sources */,
 				91BD538025AF8A3F0080C788 /* Player.swift in Sources */,
 				9130148226A5B42100755B7D /* Animation.swift in Sources */,
+				916AE9E82A8047890074452B /* NestedObservableObject.swift in Sources */,
 				91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,7 +312,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Music Player Popup/Music Player Popup.entitlements";
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -329,6 +330,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -339,7 +341,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Music Player Popup/Music Player Popup.entitlements";
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -356,6 +359,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.MusicPlayerPopup;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -384,9 +388,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */ = {
+		916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin";
+			repositoryURL = "https://github.com/katoemba/libmpdclient-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -395,9 +407,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		91DDEC4C276BCBEC0083814E /* LaunchAtLogin */ = {
+		916AE9E22A7ECB290074452B /* libmpdclient */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 91DDEC4B276BCBEC0083814E /* XCRemoteSwiftPackageReference "LaunchAtLogin" */;
+			package = 916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */;
+			productName = libmpdclient;
+		};
+		916AE9E52A7ED1C80074452B /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
 		};
 /* End XCSwiftPackageProductDependency section */
