@@ -16,7 +16,7 @@ class Player: ObservableObject {
 
     private var isRunning = true
 
-    private var idle = ConnectionManager()
+    private var idle = ConnectionManager(idle: true)
     private var command = ConnectionManager()
 
     init() {
@@ -50,14 +50,12 @@ class Player: ObservableObject {
 
             while self.isRunning {
                 DispatchQueue.main.sync {
-                    self.idle.connect()
-
                     self.status.set()
                     self.song.set()
                 }
 
                 if mpd_run_idle_mask(self.idle.connection, MPD_IDLE_PLAYER) == mpd_idle(0) {
-                    continue
+                    self.idle.connect()
                 }
             }
         }
@@ -66,15 +64,11 @@ class Player: ObservableObject {
     @objc func popoverIsOpening(_: NSNotification?) {
         popoverIsOpen = true
         status.trackElapsed()
-
-        debugPrint("Opened popover")
     }
 
     @objc func popoverIsClosing(_: NSNotification?) {
         popoverIsOpen = false
         status.timer?.invalidate()
-
-        debugPrint("Closed popover")
     }
 
     func pause(_ value: Bool) {
@@ -121,21 +115,33 @@ class ConnectionManager {
 
     var connection: OpaquePointer?
 
+    private var idle: Bool
+
+    init(idle: Bool = false) {
+        self.idle = idle
+
+        if idle {
+            connect()
+        }
+    }
+
     func connect() {
-        if connection == nil || mpd_connection_get_error(connection) != MPD_ERROR_SUCCESS {
-            connection = mpd_connection_new(host, UInt32(port), 0)
+        if connection != nil {
+            mpd_connection_free(connection)
+        }
+
+        connection = mpd_connection_new(host, UInt32(port), 0)
+        if idle {
+            mpd_connection_set_keepalive(connection, true)
         }
     }
 
     func execute(_ action: (OpaquePointer) -> Void) {
         connect()
-        guard connection != nil else {
-            debugPrint("Failed to connect to MPD: " + String(cString: mpd_connection_get_error_message(connection)))
-
-            return
-        }
-
         action(connection!)
+
+        mpd_connection_free(connection)
+        connection = nil
     }
 }
 
@@ -168,8 +174,6 @@ class Status: PlayerResponse {
 
     func set() {
         guard let recv = mpd_run_status(idle!.connection) else {
-            debugPrint("Failed to get MPD status: " + String(cString: mpd_connection_get_error_message(idle!.connection)))
-
             return
         }
 
@@ -190,8 +194,6 @@ class Status: PlayerResponse {
                 self.update(&self.elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
 
                 mpd_status_free(recv)
-
-                debugPrint("Set elapsed time")
             }
         }
     }
@@ -208,8 +210,6 @@ class Song: PlayerResponse {
 
     func set() {
         guard let recv = mpd_run_current_song(idle!.connection) else {
-            debugPrint("Failed to get MPD status: " + String(cString: mpd_connection_get_error_message(idle!.connection)))
-
             return
         }
 
@@ -222,32 +222,27 @@ class Song: PlayerResponse {
     }
 
     func setArtwork() {
-        command!.execute { connection in
-            guard location != nil else {
-                return
-            }
+        guard location != nil else {
+            return
+        }
 
-            var imageData = Data()
-            var offset: UInt32 = 0
-            let bufferSize = 1024 * 1024
-            var buffer = [UInt8](repeating: 0, count: bufferSize)
+        var imageData = Data()
+        var offset: UInt32 = 0
+        let bufferSize = 1024 * 1024
+        var buffer = [UInt8](repeating: 0, count: bufferSize)
 
+        command!.execute { _ in
             while true {
-                let bytesRead = mpd_run_readpicture(connection, location!, offset, &buffer, bufferSize)
-                if bytesRead < 1 {
+                let recv = mpd_run_readpicture(command!.connection, location!, offset, &buffer, bufferSize)
+                if recv < 1 {
                     break
                 }
 
-                imageData.append(contentsOf: buffer[..<Int(bytesRead)])
-                offset += UInt32(bytesRead)
+                imageData.append(contentsOf: buffer[..<Int(recv)])
+                offset += UInt32(recv)
             }
-
-            guard imageData.count > 0 else {
-                return
-            }
-            update(&artwork, value: NSImage(data: imageData))
-
-            debugPrint("Set artwork")
         }
+
+        update(&artwork, value: NSImage(data: imageData))
     }
 }

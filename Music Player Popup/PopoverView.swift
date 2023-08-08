@@ -66,7 +66,7 @@ struct PopoverView: View {
             }
 
             player.song.setArtwork()
-
+ 
             var lastFireTime: DispatchTime = .now()
             let debounceInterval: TimeInterval = 0.2
 
