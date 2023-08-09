@@ -1,6 +1,6 @@
 //
 //  CGFloat.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 28/06/2021.
 //
@@ -12,7 +12,7 @@ extension Double {
         var minutes = self / 60
         minutes.round(.down)
         let seconds = self - minutes * 60
-        
+
         return String(format: "%01d:%02d", Int(minutes), Int(seconds))
     }
 }

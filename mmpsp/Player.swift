@@ -1,6 +1,6 @@
 //
 //  Player.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 13/01/2021.
 //
@@ -54,7 +54,7 @@ class Player: ObservableObject {
                     self.song.set()
                 }
 
-                if mpd_run_idle_mask(self.idle.connection, MPD_IDLE_PLAYER) == mpd_idle(0) {
+                if mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
                     self.idle.connect()
                 }
             }
@@ -95,9 +95,15 @@ class Player: ObservableObject {
         }
     }
 
-    func random(_ value: Bool) {
+    func setRandom(_ value: Bool) {
         command.execute { connection in
             mpd_run_random(connection, value)
+        }
+    }
+
+    func setRepeat(_ value: Bool) {
+        command.execute { connection in
+            mpd_run_repeat(connection, value)
         }
     }
 
@@ -166,9 +172,10 @@ class PlayerResponse: ObservableObject {
 }
 
 class Status: PlayerResponse {
-    @Published var state: String?
     @Published var elapsed: Double?
-    @Published var random: Bool?
+    @Published var isPlaying: Bool?
+    @Published var isRandom: Bool?
+    @Published var isRepeat: Bool?
 
     var timer: Timer?
 
@@ -177,9 +184,10 @@ class Status: PlayerResponse {
             return
         }
 
-        update(&state, value: mpd_status_get_state(recv) == MPD_STATE_PLAY ? "play" : "pause")
         update(&elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
-        update(&random, value: mpd_status_get_random(recv))
+        update(&isPlaying, value: mpd_status_get_state(recv) == MPD_STATE_PLAY)
+        update(&isRandom, value: mpd_status_get_random(recv))
+        update(&isRepeat, value: mpd_status_get_repeat(recv))
 
         mpd_status_free(recv)
     }
@@ -213,6 +221,7 @@ class Song: PlayerResponse {
             return
         }
 
+        // TODO: These functions can sometimes return nil.
         update(&artist, value: String(cString: mpd_song_get_tag(recv, MPD_TAG_ARTIST, 0)))
         update(&title, value: String(cString: mpd_song_get_tag(recv, MPD_TAG_TITLE, 0)))
         update(&duration, value: Double(mpd_song_get_duration(recv)))

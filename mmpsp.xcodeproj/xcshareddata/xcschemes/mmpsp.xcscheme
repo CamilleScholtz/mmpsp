@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "916DB18525AA7D84001321B5"
-               BuildableName = "Music Player Popup.app"
-               BlueprintName = "Music Player Popup"
-               ReferencedContainer = "container:Music Player Popup.xcodeproj">
+               BuildableName = "mmpsp.app"
+               BlueprintName = "mmpsp"
+               ReferencedContainer = "container:mmpsp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,7 +31,7 @@
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "916DB18525AA7D84001321B5"
-            BuildableName = "Music Player Popup.app"
-            BlueprintName = "Music Player Popup"
-            ReferencedContainer = "container:Music Player Popup.xcodeproj">
+            BuildableName = "mmpsp.app"
+            BlueprintName = "mmpsp"
+            ReferencedContainer = "container:mmpsp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "916DB18525AA7D84001321B5"
-            BuildableName = "Music Player Popup.app"
-            BlueprintName = "Music Player Popup"
-            ReferencedContainer = "container:Music Player Popup.xcodeproj">
+            BuildableName = "mmpsp.app"
+            BlueprintName = "mmpsp"
+            ReferencedContainer = "container:mmpsp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

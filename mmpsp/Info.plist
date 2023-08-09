@@ -20,11 +20,9 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music</string>
-	<key>LSUIElement</key>
-	<true/>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>Music Player Popup needs access to the Music app.</string>
+	<key>LSUIElement</key>
+	<true/>
 </dict>
 </plist>

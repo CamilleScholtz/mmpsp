@@ -1,6 +1,6 @@
 //
 //  PopoverView.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 10/01/2021.
 //
@@ -66,7 +66,7 @@ struct PopoverView: View {
             }
 
             player.song.setArtwork()
- 
+
             var lastFireTime: DispatchTime = .now()
             let debounceInterval: TimeInterval = 0.2
 
@@ -101,8 +101,8 @@ struct PopoverView: View {
                 return event
             }
         }
-        .onChange(of: player.status.state) { value in
-            showInfo = value != "play" || isHovering
+        .onChange(of: player.status.isPlaying!) { value in
+            showInfo = value || isHovering
         }
         .onChange(of: player.song.location) { _ in
             guard player.popoverIsOpen else {
@@ -117,14 +117,12 @@ struct PopoverView: View {
             }
 
             updateHeight()
-
-            debugPrint("Updated height")
         }
         .onHover { value in
             if !value {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     if !isHovering {
-                        showInfo = false || player.status.state != "play"
+                        showInfo = false || !player.status.isPlaying!
                     }
                 }
             } else {
@@ -171,7 +169,7 @@ struct Footer: View {
                 Spacer()
 
                 HStack(alignment: .center) {
-                    Random()
+                    Repeat()
                         .offset(x: 10)
 
                     Spacer()
@@ -184,8 +182,8 @@ struct Footer: View {
 
                     Spacer()
 
-//                    Loved()
-//                        .offset(x: -10)
+                    Random()
+                        .offset(x: -10)
                 }
 
                 Spacer()
@@ -255,7 +253,7 @@ struct Pause: View {
     @State private var transparency: Double = 0.0
 
     var body: some View {
-        Image(systemName: (player.status.state ?? "pause") + ".circle.fill")
+        Image(systemName: (player.status.isPlaying! ? "play" : "pause") + ".circle.fill")
             .font(.system(size: 35))
             .blendMode(.overlay)
             .scaleEffect(hover ? 1.2 : 1)
@@ -264,7 +262,7 @@ struct Pause: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.pause(player.status.state == "play")
+                player.pause(player.status.isPlaying!)
             })
     }
 }
@@ -316,9 +314,9 @@ struct Random: View {
 
     var body: some View {
         Image(systemName: "shuffle")
-            .foregroundColor(Color(player.status.random ?? false ? .textBackgroundColor : .textColor))
+            .foregroundColor(Color(player.status.isRandom ?? false ? .textBackgroundColor : .textColor))
             .blendMode(.overlay)
-            .animation(.interactiveSpring(), value: player.status.random ?? false)
+            .animation(.interactiveSpring(), value: player.status.isRandom ?? false)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
             .animation(.interactiveSpring(), value: hover)
@@ -326,7 +324,29 @@ struct Random: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.random(!(player.status.random ?? false))
+                player.setRandom(!(player.status.isRandom ?? false))
+            })
+    }
+}
+
+struct Repeat: View {
+    @EnvironmentObject var player: Player
+
+    @State private var hover = false
+
+    var body: some View {
+        Image(systemName: "repeat")
+            .foregroundColor(Color(player.status.isRepeat ?? false ? .textBackgroundColor : .textColor))
+            .blendMode(.overlay)
+            .animation(.interactiveSpring(), value: player.status.isRepeat ?? false)
+            .padding(10)
+            .scaleEffect(hover ? 1.2 : 1)
+            .animation(.interactiveSpring(), value: hover)
+            .onHover(perform: { value in
+                hover = value
+            })
+            .onTapGesture(perform: {
+                player.setRepeat(!(player.status.isRepeat ?? false))
             })
     }
 }

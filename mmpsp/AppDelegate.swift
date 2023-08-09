@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 10/01/2021.
 //
@@ -125,7 +125,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // TODO: `case .scrollWheel` doesn't work.
         switch event.type {
         case .rightMouseDown:
-            player.pause(player.status.state == "play")
+            player.pause(player.status.isPlaying!)
         default:
             togglePopover(sender)
         }

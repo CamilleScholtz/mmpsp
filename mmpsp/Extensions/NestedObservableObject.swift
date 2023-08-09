@@ -1,6 +1,6 @@
 //
 //  Animation.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 19/07/2021.
 //

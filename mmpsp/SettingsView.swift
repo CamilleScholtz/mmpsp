@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  Music Player Popup
+//  mmpsp
 //
 //  Created by Camille Scholtz on 31/01/2022.
 //

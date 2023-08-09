@@ -1,3 +1,3 @@
-#  Music Player Popup
+# mmpsp
 
-A menubar popover for MacOS that interacts with Apple Music.
+MacOS music player swift popover.
