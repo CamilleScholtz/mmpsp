@@ -5,7 +5,6 @@
 //  Created by Camille Scholtz on 10/01/2021.
 //
 
-import LaunchAtLogin
 import SwiftUI
 
 @main struct MusicPlayerPopupApp: App {

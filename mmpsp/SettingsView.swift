@@ -19,20 +19,24 @@ struct SettingsView: View {
     @AppStorage(Setting.port) var port = 6600
 
     var body: some View {
-        ZStack {
+        HStack {
             Form {
                 LaunchAtLogin.Toggle()
+                    .padding(.bottom, 10)
 
-                HStack {
-                    TextField("MPD host", text: $host)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                TextField("MPD host", text: $host)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                    TextField("MPD port", value: $port, formatter: NumberFormatter())
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                TextField("MPD port", value: $port, formatter: NumberFormatter())
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.bottom, 20)
+
+                Button("Done") {
+                    NSApplication.shared.keyWindow?.close()
                 }
             }
         }
         .padding(20)
-        .frame(width: 400, height: 400)
+        .frame(width: 250, height: 250)
     }
 }
