@@ -3,30 +3,30 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		9130148226A5B42100755B7D /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130148126A5B42100755B7D /* Animation.swift */; };
+		9136948D2A88290600015DFA /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9136948B2A8828EA00015DFA /* AppIcon.icns */; };
 		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
 		916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E22A7ECB290074452B /* libmpdclient */; };
 		916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E52A7ED1C80074452B /* LaunchAtLogin */; };
 		916AE9E82A8047890074452B /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916AE9E72A8047890074452B /* NestedObservableObject.swift */; };
 		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
 		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
-		916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 916DB18D25AA7D86001321B5 /* Assets.xcassets */; };
 		91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* Double.swift */; };
 		91BD538025AF8A3F0080C788 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BD537F25AF8A3F0080C788 /* Player.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9130148126A5B42100755B7D /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
+		9136948B2A8828EA00015DFA /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = ../../../../../Downloads/AppIcon.icns; sourceTree = "<group>"; };
 		915A7CF327A877ED00B23398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		916AE9E72A8047890074452B /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		916DB18625AA7D84001321B5 /* mmpsp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mmpsp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		916DB18925AA7D84001321B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		916DB18B25AA7D84001321B5 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
-		916DB18D25AA7D86001321B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		916DB19225AA7D86001321B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		919E4EEC26939DBA0001B272 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		919E4EED2693AA060001B272 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
@@ -48,6 +48,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		913694842A88254500015DFA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9136948B2A8828EA00015DFA /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		916DB17D25AA7D84001321B5 = {
 			isa = PBXGroup;
 			children = (
@@ -69,13 +77,13 @@
 		916DB18825AA7D84001321B5 /* mmpsp */ = {
 			isa = PBXGroup;
 			children = (
+				913694842A88254500015DFA /* Resources */,
 				91A756A92667C4A700181D8C /* mmpsp.entitlements */,
 				919056ED266700D800C6096A /* Extensions */,
 				916DB18925AA7D84001321B5 /* AppDelegate.swift */,
 				916DB18B25AA7D84001321B5 /* PopoverView.swift */,
 				915A7CF327A877ED00B23398 /* SettingsView.swift */,
 				91BD537F25AF8A3F0080C788 /* Player.swift */,
-				916DB18D25AA7D86001321B5 /* Assets.xcassets */,
 				916DB19225AA7D86001321B5 /* Info.plist */,
 			);
 			path = mmpsp;
@@ -131,7 +139,7 @@
 				};
 			};
 			buildConfigurationList = 916DB18125AA7D84001321B5 /* Build configuration list for PBXProject "mmpsp" */;
-			compatibilityVersion = "Xcode 12.0";
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -157,7 +165,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				916DB18E25AA7D86001321B5 /* Assets.xcassets in Resources */,
+				9136948D2A88290600015DFA /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,8 +314,9 @@
 		916DB19725AA7D86001321B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.icns;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = mmpsp/mmpsp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
@@ -319,6 +328,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = NO;
 				INFOPLIST_FILE = mmpsp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = mmpsp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -336,8 +346,9 @@
 		916DB19825AA7D86001321B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon.icns;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = mmpsp/mmpsp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
@@ -349,6 +360,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = NO;
 				INFOPLIST_FILE = mmpsp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = mmpsp;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

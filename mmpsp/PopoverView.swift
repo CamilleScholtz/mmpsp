@@ -253,7 +253,7 @@ struct Pause: View {
     @State private var transparency: Double = 0.0
 
     var body: some View {
-        Image(systemName: (player.status.isPlaying! ? "play" : "pause") + ".circle.fill")
+        Image(systemName: (player.status.isPlaying! ? "pause" : "play") + ".circle.fill")
             .font(.system(size: 35))
             .blendMode(.overlay)
             .scaleEffect(hover ? 1.2 : 1)

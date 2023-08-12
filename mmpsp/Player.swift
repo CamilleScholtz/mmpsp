@@ -161,8 +161,8 @@ class PlayerResponse: ObservableObject {
     var idle: ConnectionManager?
     var command: ConnectionManager?
 
-    func update<T: Equatable>(_ variable: inout T, value: T?, notification: Notification.Name? = nil) {
-        guard let value = value, variable != value else {
+    func update<T: Equatable>(_ variable: inout T?, value: T?, notification: Notification.Name? = nil) {
+        guard variable != value else {
             return
         }
 
@@ -227,9 +227,16 @@ class Song: PlayerResponse {
             return
         }
 
-        // TODO: These functions can sometimes return nil.
-        update(&artist, value: String(cString: mpd_song_get_tag(recv, MPD_TAG_ARTIST, 0)))
-        update(&title, value: String(cString: mpd_song_get_tag(recv, MPD_TAG_TITLE, 0)))
+        if let tag = mpd_song_get_tag(recv, MPD_TAG_ARTIST, 0) {
+            update(&artist, value: String(cString: tag))
+        } else {
+            update(&artist, value: nil)
+        }
+        if let tag = mpd_song_get_tag(recv, MPD_TAG_TITLE, 0) {
+            update(&title, value: String(cString: tag))
+        } else {
+            update(&title, value: nil)
+        }
         update(&duration, value: Double(mpd_song_get_duration(recv)))
         update(&location, value: String(cString: mpd_song_get_uri(recv)), notification: Notification.Name("PlayerDidChangeNotification"))
 

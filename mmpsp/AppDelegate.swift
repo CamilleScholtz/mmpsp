@@ -31,10 +31,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func configureStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.action = #selector(buttonAction(_:))
-        statusItem.button?.sendAction(on: [.leftMouseDown, .rightMouseDown])
+        statusItem.button!.action = #selector(buttonAction(_:))
+        statusItem.button!.sendAction(on: [.leftMouseDown, .rightMouseDown])
 
-        statusItem.button?.postsFrameChangedNotifications = true
+        statusItem.button!.postsFrameChangedNotifications = true
 
         NotificationCenter.default.addObserver(
             self,
@@ -84,29 +84,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func showPopover(_ sender: NSStatusBarButton?) {
+    private func showPopover(_ sender: NSStatusBarButton?, iteration: Int? = nil) {
         guard let sender = sender else {
             return
         }
 
-        let positioningRect = NSRect(
-            origin: NSPoint(x: sender.frame.origin.x + (sender.frame.width - 75), y: sender.frame.origin.y),
-            size: sender.frame.size
+        popover.show(
+            relativeTo: NSRect(
+                origin: NSPoint(x: sender.frame.origin.x + (sender.frame.width - 75), y: sender.frame.origin.y),
+                size: sender.frame.size
+            ),
+            of: sender,
+            preferredEdge: .maxY
         )
 
-        if popover.isShown {
-            popover.positioningRect = positioningRect
-
-            // TODO: hack, some race issue or something
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.popover.positioningRect = positioningRect
+        // XXX: Little hack to make sure the popover is in the right position.
+        if popover.isShown && iteration != nil && iteration! < 3 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                self.showPopover(sender, iteration: iteration! + 1)
             }
-        } else {
-            popover.show(
-                relativeTo: positioningRect,
-                of: sender,
-                preferredEdge: .maxY
-            )
         }
     }
 
@@ -119,7 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        showPopover(sender)
+        showPopover(sender, iteration: 0)
     }
 
     @objc func handleTerminate(_: Notification) {
