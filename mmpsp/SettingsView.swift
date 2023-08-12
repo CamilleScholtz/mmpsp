@@ -21,6 +21,8 @@ struct SettingsView: View {
     var body: some View {
         HStack {
             Form {
+                Spacer()
+
                 LaunchAtLogin.Toggle()
                     .padding(.bottom, 10)
 
@@ -29,10 +31,23 @@ struct SettingsView: View {
 
                 TextField("MPD port", value: $port, formatter: NumberFormatter())
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.bottom, 20)
 
-                Button("Done") {
-                    NSApplication.shared.keyWindow?.close()
+                Spacer()
+
+                HStack {
+                    Button("Close") {
+                        NSApp.keyWindow?.close()
+                    }
+
+                    Button("Exit app") {
+                        NSApp.keyWindow?.close()
+                        NotificationCenter.default.post(
+                            name: NSApplication.willTerminateNotification,
+                            object: nil
+                        )
+                    }
+                    .background(.red.opacity(0.2))
+                    .cornerRadius(5)
                 }
             }
         }

@@ -48,6 +48,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSView.frameDidChangeNotification,
             object: statusItem.button
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTerminate(_:)),
+            name: NSApplication.willTerminateNotification,
+            object: nil
+        )
 
         setStatusItemTitle()
     }
@@ -114,6 +120,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         showPopover(sender)
+    }
+
+    @objc func handleTerminate(_: Notification) {
+        popover.close()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.player.disconnect()
+        }
+
+        NSApplication.shared.terminate(self)
     }
 
     @objc func buttonAction(_ sender: NSStatusBarButton?) {

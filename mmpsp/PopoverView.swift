@@ -388,7 +388,7 @@ struct Gear: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                NSApplication.shared.keyWindow?.contentViewController?.presentAsSheet(NSHostingController(rootView: SettingsView()))
+                NSApp.keyWindow?.contentViewController?.presentAsSheet(NSHostingController(rootView: SettingsView()))
             })
     }
 }

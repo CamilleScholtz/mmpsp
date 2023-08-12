@@ -54,7 +54,9 @@ class Player: ObservableObject {
                     self.song.set()
                 }
 
-                if mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
+                if mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0)
+                    && self.isRunning
+                {
                     self.idle.connect()
                 }
             }
@@ -107,11 +109,15 @@ class Player: ObservableObject {
         }
     }
 
-    func stop() {
+    func disconnect() {
         isRunning = false
 
-        mpd_connection_free(idle.connection)
-        mpd_connection_free(command.connection)
+        if idle.connection != nil {
+            mpd_connection_free(idle.connection)
+        }
+        if command.connection != nil {
+            mpd_connection_free(command.connection)
+        }
     }
 }
 
