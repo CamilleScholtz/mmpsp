@@ -15,16 +15,17 @@ class Player: ObservableObject {
     // TODO: Move popover specific logic to a superclass.
     @Published var popoverIsOpen = false
 
-    private var idle = ConnectionManager(idle: true)
-    private var command = ConnectionManager()
+    private var idleManager = ConnectionManager(idle: true)
+    private var commandManager = ConnectionManager()
 
     private var isRunning = true
+    private let retryConnectionInterval: UInt32 = 5
 
     init() {
-        status.idle = idle
-        status.command = command
-        song.idle = idle
-        song.command = command
+        status.idleManager = idleManager
+        status.commandManager = commandManager
+        song.idleManager = idleManager
+        song.commandManager = commandManager
 
         startUpdateLoop()
 
@@ -48,16 +49,16 @@ class Player: ObservableObject {
     }
 
     private func startUpdateLoop() {
-        DispatchQueue(label: "MPDUpdateQueue").async { [weak self] in
+        DispatchQueue(label: "MPDIdleQueue").async { [weak self] in
             guard let self = self else {
                 return
             }
 
             while self.isRunning {
-                if !self.idle.isConnected {
-                    idle.connect()
-                    if !self.idle.isConnected {
-                        sleep(5)
+                if !self.idleManager.isConnected {
+                    idleManager.connect()
+                    if !self.idleManager.isConnected {
+                        sleep(retryConnectionInterval)
                     }
                 }
 
@@ -66,8 +67,9 @@ class Player: ObservableObject {
                     self.song.set()
                 }
 
-                // TODO: What will happen if the connection is lost?
-                mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue))
+                if mpd_run_idle_mask(self.idleManager.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
+                    self.idleManager.disconnect()
+                }
             }
         }
     }
@@ -83,37 +85,37 @@ class Player: ObservableObject {
     }
 
     func pause(_ value: Bool) {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_pause(connection, value)
         }
     }
 
     func previous() {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_previous(connection)
         }
     }
 
     func next() {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_next(connection)
         }
     }
 
     func seek(_ value: Double) {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_seek_current(connection, Float(value), false)
         }
     }
 
     func setRandom(_ value: Bool) {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_random(connection, value)
         }
     }
 
     func setRepeat(_ value: Bool) {
-        command.execute { connection in
+        commandManager.execute { connection in
             mpd_run_repeat(connection, value)
         }
     }
@@ -170,8 +172,8 @@ class ConnectionManager {
 }
 
 class PlayerResponse: ObservableObject {
-    var idle: ConnectionManager?
-    var command: ConnectionManager?
+    var idleManager: ConnectionManager?
+    var commandManager: ConnectionManager?
 
     func update<T: Equatable>(_ variable: inout T?, value: T?, notification: Notification.Name? = nil) {
         guard variable != value else {
@@ -198,7 +200,7 @@ class Status: PlayerResponse {
     var timer: Timer?
 
     func set() {
-        guard let recv = mpd_run_status(idle!.connection) else {
+        guard let recv = mpd_run_status(idleManager!.connection) else {
             return
         }
 
@@ -212,7 +214,7 @@ class Status: PlayerResponse {
 
     func trackElapsed() {
         timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            self.command!.execute { connection in
+            self.commandManager!.execute { connection in
                 guard let recv = mpd_run_status(connection) else {
                     return
                 }
@@ -235,7 +237,7 @@ class Song: PlayerResponse {
     var description: String { return "\(artist ?? "Unknown artist") - \(title ?? "Unknown title")" }
 
     func set() {
-        guard let recv = mpd_run_current_song(idle!.connection) else {
+        guard let recv = mpd_run_current_song(idleManager!.connection) else {
             return
         }
 
@@ -265,9 +267,9 @@ class Song: PlayerResponse {
         let bufferSize = 1024 * 1024
         var buffer = [UInt8](repeating: 0, count: bufferSize)
 
-        command!.execute { _ in
+        commandManager!.execute { connection in
             while true {
-                let recv = mpd_run_readpicture(command!.connection, location!, offset, &buffer, bufferSize)
+                let recv = mpd_run_readpicture(connection, location!, offset, &buffer, bufferSize)
                 if recv < 1 {
                     break
                 }
