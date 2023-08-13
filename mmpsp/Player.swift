@@ -12,12 +12,13 @@ class Player: ObservableObject {
     @NestedObservableObject var status = Status()
     @NestedObservableObject var song = Song()
 
+    // TODO: Move popover specific logic to a superclass.
     @Published var popoverIsOpen = false
-
-    private var isRunning = true
 
     private var idle = ConnectionManager(idle: true)
     private var command = ConnectionManager()
+
+    private var isRunning = true
 
     init() {
         status.idle = idle
@@ -42,6 +43,10 @@ class Player: ObservableObject {
         )
     }
 
+    deinit {
+        isRunning = false
+    }
+
     private func startUpdateLoop() {
         DispatchQueue(label: "MPDUpdateQueue").async { [weak self] in
             guard let self = self else {
@@ -49,16 +54,20 @@ class Player: ObservableObject {
             }
 
             while self.isRunning {
+                if !self.idle.isConnected {
+                    idle.connect()
+                    if !self.idle.isConnected {
+                        sleep(5)
+                    }
+                }
+
                 DispatchQueue.main.sync {
                     self.status.set()
                     self.song.set()
                 }
 
-                if mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0)
-                    && self.isRunning
-                {
-                    self.idle.connect()
-                }
+                // TODO: What will happen if the connection is lost?
+                mpd_run_idle_mask(self.idle.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue))
             }
         }
     }
@@ -108,17 +117,6 @@ class Player: ObservableObject {
             mpd_run_repeat(connection, value)
         }
     }
-
-    func disconnect() {
-        isRunning = false
-
-        if idle.connection != nil {
-            mpd_connection_free(idle.connection)
-        }
-        if command.connection != nil {
-            mpd_connection_free(command.connection)
-        }
-    }
 }
 
 class ConnectionManager {
@@ -126,34 +124,48 @@ class ConnectionManager {
     @AppStorage(Setting.port) var port = 6600
 
     var connection: OpaquePointer?
+    var isConnected: Bool = false
 
     private var idle: Bool
 
     init(idle: Bool = false) {
         self.idle = idle
+    }
 
-        if idle {
-            connect()
-        }
+    deinit {
+        disconnect()
     }
 
     func connect() {
-        if connection != nil {
-            mpd_connection_free(connection)
-        }
+        disconnect()
 
         connection = mpd_connection_new(host, UInt32(port), 0)
+        guard mpd_connection_get_error(connection) == MPD_ERROR_SUCCESS else {
+            return
+        }
+
+        isConnected = true
+
         if idle {
             mpd_connection_set_keepalive(connection, true)
         }
     }
 
-    func execute(_ action: (OpaquePointer) -> Void) {
-        connect()
-        action(connection!)
+    func disconnect() {
+        guard connection != nil else {
+            return
+        }
 
         mpd_connection_free(connection)
         connection = nil
+
+        isConnected = false
+    }
+
+    func execute(_ action: (OpaquePointer) -> Void) {
+        connect()
+        action(connection!)
+        disconnect()
     }
 }
 

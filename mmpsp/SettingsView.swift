@@ -11,7 +11,6 @@ import SwiftUI
 enum Setting {
     static let host = "host"
     static let port = "port"
-    static let directory = "directory"
 }
 
 struct SettingsView: View {

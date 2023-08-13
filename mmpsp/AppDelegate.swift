@@ -120,10 +120,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func handleTerminate(_: Notification) {
         popover.close()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.player.disconnect()
-        }
-
         NSApplication.shared.terminate(self)
     }
 

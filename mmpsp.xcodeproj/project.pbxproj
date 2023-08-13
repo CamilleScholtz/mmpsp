@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9130148226A5B42100755B7D /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130148126A5B42100755B7D /* Animation.swift */; };
-		9136948D2A88290600015DFA /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9136948B2A8828EA00015DFA /* AppIcon.icns */; };
+		9136948F2A890EFD00015DFA /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9136948E2A890EFD00015DFA /* AppIcon.icns */; };
 		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
 		916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E22A7ECB290074452B /* libmpdclient */; };
 		916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E52A7ED1C80074452B /* LaunchAtLogin */; };
@@ -21,7 +21,7 @@
 
 /* Begin PBXFileReference section */
 		9130148126A5B42100755B7D /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
-		9136948B2A8828EA00015DFA /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = ../../../../../Downloads/AppIcon.icns; sourceTree = "<group>"; };
+		9136948E2A890EFD00015DFA /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		915A7CF327A877ED00B23398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		916AE9E72A8047890074452B /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		916DB18625AA7D84001321B5 /* mmpsp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mmpsp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,7 +51,7 @@
 		913694842A88254500015DFA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				9136948B2A8828EA00015DFA /* AppIcon.icns */,
+				9136948E2A890EFD00015DFA /* AppIcon.icns */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -165,7 +165,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9136948D2A88290600015DFA /* AppIcon.icns in Resources */,
+				9136948F2A890EFD00015DFA /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

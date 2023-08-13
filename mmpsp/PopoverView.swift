@@ -101,7 +101,7 @@ struct PopoverView: View {
                 return event
             }
         }
-        .onChange(of: player.status.isPlaying!) { value in
+        .onChange(of: player.status.isPlaying ?? false) { value in
             showInfo = value || isHovering
         }
         .onChange(of: player.song.location) { _ in
@@ -122,7 +122,7 @@ struct PopoverView: View {
             if !value {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     if !isHovering {
-                        showInfo = false || !player.status.isPlaying!
+                        showInfo = false || !(player.status.isPlaying ?? false)
                     }
                 }
             } else {
@@ -253,7 +253,7 @@ struct Pause: View {
     @State private var transparency: Double = 0.0
 
     var body: some View {
-        Image(systemName: (player.status.isPlaying! ? "pause" : "play") + ".circle.fill")
+        Image(systemName: (player.status.isPlaying ?? false ? "pause" : "play") + ".circle.fill")
             .font(.system(size: 35))
             .blendMode(.overlay)
             .scaleEffect(hover ? 1.2 : 1)
@@ -262,7 +262,7 @@ struct Pause: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.pause(player.status.isPlaying!)
+                player.pause(player.status.isPlaying ?? false)
             })
     }
 }
@@ -350,30 +350,6 @@ struct Repeat: View {
             })
     }
 }
-
-// struct Loved: View {
-//    @EnvironmentObject var player: Player
-//
-//    @State private var hover = false
-//
-//    var body: some View {
-//        Image(systemName: player.track?.isLoved ?? false ? "heart.fill" : "heart")
-//            .foregroundColor(Color(player.track?.isLoved ?? false ? .systemRed : .textColor))
-//            .blendMode(player.track?.isLoved ?? false ? .multiply : .overlay)
-//            .animation(.interactiveSpring(), value: player.track?.isLoved)
-//            .padding(10)
-//            .scaleEffect(player.track?.isLoved ?? false ? 1.1 : 1)
-//            .scaleEffect(hover ? 1.2 : 1)
-//            .animation(.interactiveSpring(), value: hover)
-//            .animation(.easeInOut(duration: 0.2).delay(0.1).repeat(while: player.track?.isLoved ?? false), value: player.track?.isLoved)
-//            .onHover(perform: { value in
-//                hover = value
-//            })
-//            .onTapGesture(perform: {
-//                player.setLoved(!(player.track?.isLoved ?? false))
-//            })
-//    }
-// }
 
 struct Gear: View {
     @State private var hover = false
