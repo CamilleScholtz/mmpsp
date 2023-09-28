@@ -62,7 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSViewController()
         popover.contentViewController!.view = NSHostingView(
             rootView: PopoverView()
-                .environmentObject(player)
+                .environment(player)
         )
         popover.behavior = .semitransient
     }

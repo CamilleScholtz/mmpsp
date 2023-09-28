@@ -8,12 +8,12 @@
 import libmpdclient
 import SwiftUI
 
-class Player: ObservableObject {
-    @NestedObservableObject var status = Status()
-    @NestedObservableObject var song = Song()
+@Observable class Player {
+    var status = Status()
+    var song = Song()
 
     // TODO: Move popover specific logic to a superclass.
-    @Published var popoverIsOpen = false
+    var popoverIsOpen = false
 
     private var idleManager = ConnectionManager(idle: true)
     private var commandManager = ConnectionManager()
@@ -171,9 +171,9 @@ class ConnectionManager {
     }
 }
 
-class PlayerResponse: ObservableObject {
-    var idleManager: ConnectionManager?
-    var commandManager: ConnectionManager?
+class PlayerResponse {
+    @ObservationIgnored var idleManager: ConnectionManager?
+    @ObservationIgnored var commandManager: ConnectionManager?
 
     func update<T: Equatable>(_ variable: inout T?, value: T?, notification: Notification.Name? = nil) {
         guard variable != value else {
@@ -191,13 +191,13 @@ class PlayerResponse: ObservableObject {
     }
 }
 
-class Status: PlayerResponse {
-    @Published var elapsed: Double?
-    @Published var isPlaying: Bool?
-    @Published var isRandom: Bool?
-    @Published var isRepeat: Bool?
+@Observable class Status: PlayerResponse {
+    var elapsed: Double?
+    var isPlaying: Bool?
+    var isRandom: Bool?
+    var isRepeat: Bool?
 
-    var timer: Timer?
+    @ObservationIgnored var timer: Timer?
 
     func set() {
         guard let recv = mpd_run_status(idleManager!.connection) else {
@@ -227,12 +227,12 @@ class Status: PlayerResponse {
     }
 }
 
-class Song: PlayerResponse {
-    @Published var artist: String?
-    @Published var title: String?
-    @Published var location: String?
-    @Published var duration: Double?
-    @Published var artwork: NSImage?
+@Observable class Song: PlayerResponse {
+    var artist: String?
+    var title: String?
+    var location: String?
+    var duration: Double?
+    var artwork: NSImage?
 
     var description: String { return "\(artist ?? "Unknown artist") - \(title ?? "Unknown title")" }
 

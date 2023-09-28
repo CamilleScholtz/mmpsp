@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PopoverView: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var height = Double(250)
     @State private var isHovering = false
@@ -60,8 +60,8 @@ struct PopoverView: View {
             .scaleEffect(x: 1.5)
         )
         .frame(width: 250, height: height)
-        .onChange(of: player.popoverIsOpen) { value in
-            guard value else {
+        .onChange(of: player.popoverIsOpen) {
+            guard player.popoverIsOpen else {
                 return
             }
 
@@ -101,18 +101,18 @@ struct PopoverView: View {
                 return event
             }
         }
-        .onChange(of: player.status.isPlaying ?? false) { value in
-            showInfo = value || isHovering
+        .onChange(of: player.status.isPlaying ?? false) {
+            showInfo = (player.status.isPlaying ?? false) || isHovering
         }
-        .onChange(of: player.song.location) { _ in
+        .onChange(of: player.song.location) {
             guard player.popoverIsOpen else {
                 return
             }
 
             player.song.setArtwork()
         }
-        .onChange(of: player.song.artwork) { value in
-            guard value != nil else {
+        .onChange(of: player.song.artwork) {
+            guard player.song.artwork != nil else {
                 return
             }
 
@@ -148,7 +148,7 @@ struct PopoverView: View {
 }
 
 struct Artwork: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     var body: some View {
         Image(nsImage: player.song.artwork ?? NSImage())
@@ -159,7 +159,7 @@ struct Artwork: View {
 }
 
 struct Footer: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -196,7 +196,7 @@ struct Footer: View {
 }
 
 struct Progress: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
 
@@ -247,7 +247,7 @@ struct Progress: View {
 }
 
 struct Pause: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
     @State private var transparency: Double = 0.0
@@ -268,7 +268,7 @@ struct Pause: View {
 }
 
 struct Previous: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
 
@@ -288,7 +288,7 @@ struct Previous: View {
 }
 
 struct Next: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
 
@@ -308,7 +308,7 @@ struct Next: View {
 }
 
 struct Random: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
 
@@ -330,7 +330,7 @@ struct Random: View {
 }
 
 struct Repeat: View {
-    @EnvironmentObject var player: Player
+    @Environment(Player.self) private var player
 
     @State private var hover = false
 

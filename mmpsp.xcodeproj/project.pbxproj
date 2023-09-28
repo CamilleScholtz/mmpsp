@@ -12,7 +12,6 @@
 		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
 		916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E22A7ECB290074452B /* libmpdclient */; };
 		916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E52A7ED1C80074452B /* LaunchAtLogin */; };
-		916AE9E82A8047890074452B /* NestedObservableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916AE9E72A8047890074452B /* NestedObservableObject.swift */; };
 		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
 		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
 		91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* Double.swift */; };
@@ -23,7 +22,6 @@
 		9130148126A5B42100755B7D /* Animation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animation.swift; sourceTree = "<group>"; };
 		9136948E2A890EFD00015DFA /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		915A7CF327A877ED00B23398 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		916AE9E72A8047890074452B /* NestedObservableObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestedObservableObject.swift; sourceTree = "<group>"; };
 		916DB18625AA7D84001321B5 /* mmpsp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mmpsp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		916DB18925AA7D84001321B5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		916DB18B25AA7D84001321B5 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
@@ -94,7 +92,6 @@
 			children = (
 				91ABBCCB268A0EAD00D19910 /* Double.swift */,
 				9130148126A5B42100755B7D /* Animation.swift */,
-				916AE9E72A8047890074452B /* NestedObservableObject.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -131,7 +128,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1230;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					916DB18525AA7D84001321B5 = {
 						CreatedOnToolsVersion = 12.3;
@@ -181,7 +178,6 @@
 				915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */,
 				91BD538025AF8A3F0080C788 /* Player.swift in Sources */,
 				9130148226A5B42100755B7D /* Animation.swift in Sources */,
-				916AE9E82A8047890074452B /* NestedObservableObject.swift in Sources */,
 				91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -193,6 +189,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
@@ -227,6 +224,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -241,7 +239,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -256,6 +254,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
@@ -290,6 +289,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -300,7 +300,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -334,7 +334,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.mmpsp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -366,7 +366,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.mmpsp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
