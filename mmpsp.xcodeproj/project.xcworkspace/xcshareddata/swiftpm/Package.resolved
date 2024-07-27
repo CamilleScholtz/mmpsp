@@ -1,4 +1,5 @@
 {
+  "originHash" : "7a69fe1e4ca06db0f872bd537bec522cd01fcf8a608af3baa990d4a2c935335d",
   "pins" : [
     {
       "identity" : "launchatlogin-modern",
@@ -6,7 +7,7 @@
       "location" : "https://github.com/sindresorhus/LaunchAtLogin-Modern",
       "state" : {
         "branch" : "main",
-        "revision" : "9c41991631605c8ccfe0347bbcb5c659169f2ec5"
+        "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc"
       }
     },
     {
@@ -15,9 +16,9 @@
       "location" : "https://github.com/katoemba/libmpdclient-swift",
       "state" : {
         "branch" : "master",
-        "revision" : "583c7d40bd67ac9df57120c378ade9796a90b9f6"
+        "revision" : "edb20ac42bd657da5ca55d7301beb596ddc3f128"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

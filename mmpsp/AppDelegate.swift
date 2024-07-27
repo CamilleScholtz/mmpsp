@@ -20,106 +20,110 @@ import SwiftUI
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var player = Player()
 
-    private var statusItemStub: NSStatusItem!
+    private var popoverAnchor: NSStatusItem!
     private var statusItem: NSStatusItem!
     var popover = NSPopover()
 
     func applicationDidFinishLaunching(_: Notification) {
         configureStatusItem()
         configurePopover()
-    }
-
-    private func configureStatusItem() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button!.action = #selector(buttonAction(_:))
-        statusItem.button!.sendAction(on: [.leftMouseDown, .rightMouseDown])
-
-        statusItem.button!.postsFrameChangedNotifications = true
 
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handlePlayerDidChange(_:)),
-            name: Notification.Name("PlayerDidChangeNotification"),
+            selector: #selector(handleIsPlayingDidChange),
+            name: Notification.Name("IsPlayingDidChangeNotification"),
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleFrameChanged(_:)),
-            name: NSView.frameDidChangeNotification,
-            object: statusItem.button
+            selector: #selector(handleLocationDidChange),
+            name: Notification.Name("LocationDidChangeNotification"),
+            object: nil
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleTerminate(_:)),
+            selector: #selector(handleTerminate),
             name: NSApplication.willTerminateNotification,
             object: nil
         )
+    }
 
+    private func configureStatusItem() {
+        popoverAnchor = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        popoverAnchor.button!.action = #selector(buttonAction)
+        popoverAnchor.button!.sendAction(on: [.leftMouseDown, .rightMouseDown, .scrollWheel])
+
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        statusItem.button!.action = #selector(buttonAction)
+        statusItem.button!.sendAction(on: [.leftMouseDown, .rightMouseDown, .scrollWheel])
+
+        setPopoverAnchorImage()
         setStatusItemTitle()
     }
 
     private func configurePopover() {
+        popover.behavior = .semitransient
         popover.contentViewController = NSViewController()
         popover.contentViewController!.view = NSHostingView(
             rootView: PopoverView()
                 .environment(player)
         )
-        popover.behavior = .semitransient
     }
 
-    private func setStatusItemTitle() {
-        statusItem?.button?.title = player.song.description
+    private func setPopoverAnchorImage(_: Notification? = nil) {
+        if player.status.isPlaying ?? false {
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "mmpsp")
+        } else {
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "mmpsp")
+        }
+    }
+
+    private func setStatusItemTitle(_: Notification? = nil) {
+        var description = player.song.description
+        if description.count > 80 {
+            description = String(description.prefix(80)) + "…"
+        }
+
+        statusItem!.button!.title = description
     }
 
     private func togglePopover(_ sender: NSStatusBarButton?) {
-        guard let sender = sender else {
+        guard let sender else {
             return
         }
 
         if popover.isShown {
             popover.performClose(sender)
         } else {
-            showPopover(sender)
+            showPopover()
+
+            // https://stackoverflow.com/a/73322639/14351818
             popover.contentViewController?.view.window?.makeKey()
         }
     }
 
-    private func showPopover(_ sender: NSStatusBarButton?, iteration: Int? = nil) {
-        guard let sender = sender else {
-            return
-        }
-
+    private func showPopover() {
         popover.show(
-            relativeTo: NSRect(
-                origin: NSPoint(x: sender.frame.origin.x + (sender.frame.width - 75), y: sender.frame.origin.y),
-                size: sender.frame.size
-            ),
-            of: sender,
+            relativeTo: popoverAnchor.button!.bounds,
+            of: popoverAnchor.button!,
             preferredEdge: .maxY
         )
+    }
 
-        // XXX: Little hack to make sure the popover is in the right position.
-        if popover.isShown && iteration != nil && iteration! < 3 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                self.showPopover(sender, iteration: iteration! + 1)
-            }
+    @objc private func handleIsPlayingDidChange(_ notification: Notification) {
+        DispatchQueue.main.async {
+            self.setPopoverAnchorImage(notification)
         }
     }
 
-    @objc private func handlePlayerDidChange(_: Notification) {
-        setStatusItemTitle()
-    }
-
-    @objc func handleFrameChanged(_ notfication: Notification) {
-        guard popover.isShown, let sender = notfication.object as? NSStatusBarButton else {
-            return
+    @objc private func handleLocationDidChange(_ notification: Notification) {
+        DispatchQueue.main.async {
+            self.setStatusItemTitle(notification)
         }
-
-        showPopover(sender, iteration: 0)
     }
 
     @objc func handleTerminate(_: Notification) {
-        popover.close()
+        popover.performClose(nil)
         NSApplication.shared.terminate(self)
     }
 

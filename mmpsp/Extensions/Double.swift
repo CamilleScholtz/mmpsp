@@ -1,5 +1,5 @@
 //
-//  CGFloat.swift
+//  Double.swift
 //  mmpsp
 //
 //  Created by Camille Scholtz on 28/06/2021.

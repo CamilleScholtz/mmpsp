@@ -50,14 +50,14 @@ import SwiftUI
 
     private func startUpdateLoop() {
         DispatchQueue(label: "MPDIdleQueue").async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
-            while self.isRunning {
-                if !self.idleManager.isConnected {
+            while isRunning {
+                if !idleManager.isConnected {
                     idleManager.connect()
-                    if !self.idleManager.isConnected {
+                    if !idleManager.isConnected {
                         sleep(retryConnectionInterval)
                     }
                 }
@@ -67,8 +67,8 @@ import SwiftUI
                     self.song.set()
                 }
 
-                if mpd_run_idle_mask(self.idleManager.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
-                    self.idleManager.disconnect()
+                if mpd_run_idle_mask(idleManager.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
+                    idleManager.disconnect()
                 }
             }
         }
@@ -182,7 +182,7 @@ class PlayerResponse {
 
         variable = value
 
-        if let notification = notification {
+        if let notification {
             NotificationCenter.default.post(
                 name: notification,
                 object: nil
@@ -205,7 +205,11 @@ class PlayerResponse {
         }
 
         update(&elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
-        update(&isPlaying, value: mpd_status_get_state(recv) == MPD_STATE_PLAY)
+        update(
+            &isPlaying,
+            value: mpd_status_get_state(recv) == MPD_STATE_PLAY,
+            notification: Notification.Name("IsPlayingDidChangeNotification")
+        )
         update(&isRandom, value: mpd_status_get_random(recv))
         update(&isRepeat, value: mpd_status_get_repeat(recv))
 
@@ -234,7 +238,7 @@ class PlayerResponse {
     var duration: Double?
     var artwork: NSImage?
 
-    var description: String { return "\(artist ?? "Unknown artist") - \(title ?? "Unknown title")" }
+    var description: String { "\(artist ?? "Unknown artist") - \(title ?? "Unknown title")" }
 
     func set() {
         guard let recv = mpd_run_current_song(idleManager!.connection) else {
@@ -252,7 +256,11 @@ class PlayerResponse {
             update(&title, value: nil)
         }
         update(&duration, value: Double(mpd_song_get_duration(recv)))
-        update(&location, value: String(cString: mpd_song_get_uri(recv)), notification: Notification.Name("PlayerDidChangeNotification"))
+        update(
+            &location,
+            value: String(cString: mpd_song_get_uri(recv)),
+            notification: Notification.Name("LocationDidChangeNotification")
+        )
 
         mpd_song_free(recv)
     }
