@@ -24,22 +24,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     var popover = NSPopover()
 
+    private var changeImageWorkItem: DispatchWorkItem?
+
     func applicationDidFinishLaunching(_: Notification) {
         configureStatusItem()
         configurePopover()
 
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleIsPlayingDidChange),
-            name: Notification.Name("IsPlayingDidChangeNotification"),
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleLocationDidChange),
-            name: Notification.Name("LocationDidChangeNotification"),
-            object: nil
-        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleTerminate),
@@ -57,8 +47,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button!.action = #selector(buttonAction)
         statusItem.button!.sendAction(on: [.leftMouseDown, .rightMouseDown, .scrollWheel])
 
-        setPopoverAnchorImage()
-        setStatusItemTitle()
+        withContinuousObservationTracking(of: self.player.song.location) { _ in
+            self.setStatusItemTitle()
+        }
     }
 
     private func configurePopover() {
@@ -68,17 +59,45 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: PopoverView()
                 .environment(player)
         )
-    }
 
-    private func setPopoverAnchorImage(_: Notification? = nil) {
-        if player.status.isPlaying ?? false {
-            popoverAnchor.button!.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "mmpsp")
-        } else {
-            popoverAnchor.button!.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "mmpsp")
+        withContinuousObservationTracking(of: self.player.status.isPlaying) { value in
+            self.setPopoverAnchorImage(changed: (value ?? false) ? "play" : "pause")
+        }
+        withContinuousObservationTracking(of: self.player.status.isRandom) { value in
+            self.setPopoverAnchorImage(changed: (value ?? false) ? "random" : "sequential")
+        }
+        withContinuousObservationTracking(of: self.player.status.isRepeat) { value in
+            self.setPopoverAnchorImage(changed: (value ?? false) ? "repeat" : nil)
         }
     }
 
-    private func setStatusItemTitle(_: Notification? = nil) {
+    private func setPopoverAnchorImage(changed: String? = nil) {
+        switch changed {
+        case "play":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "play")
+        case "pause":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "pause")
+        case "random":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "shuffle", accessibilityDescription: "random")
+        case "sequential":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "sequential")
+        case "repeat":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "repeat", accessibilityDescription: "repeat")
+        default:
+            return popoverAnchor.button!.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "mmpsp")
+        }
+
+        changeImageWorkItem?.cancel()
+        changeImageWorkItem = DispatchWorkItem {
+            self.popoverAnchor.button!.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "mmpsp")
+        }
+
+        if let workItem = changeImageWorkItem {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: workItem)
+        }
+    }
+
+    private func setStatusItemTitle() {
         var description = player.song.description
         if description.count > 80 {
             description = String(description.prefix(80)) + "…"
@@ -108,18 +127,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             of: popoverAnchor.button!,
             preferredEdge: .maxY
         )
-    }
-
-    @objc private func handleIsPlayingDidChange(_ notification: Notification) {
-        DispatchQueue.main.async {
-            self.setPopoverAnchorImage(notification)
-        }
-    }
-
-    @objc private func handleLocationDidChange(_ notification: Notification) {
-        DispatchQueue.main.async {
-            self.setStatusItemTitle(notification)
-        }
     }
 
     @objc func handleTerminate(_: Notification) {

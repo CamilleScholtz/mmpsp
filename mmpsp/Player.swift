@@ -8,15 +8,16 @@
 import libmpdclient
 import SwiftUI
 
-@Observable class Player {
-    var status = Status()
-    var song = Song()
+@Observable final class Player {
+    // TODO: Is @ObservationIgnored needed here?
+    @ObservationIgnored let status = Status()
+    @ObservationIgnored let song = Song()
 
     // TODO: Move popover specific logic to a superclass.
     var popoverIsOpen = false
 
-    private var idleManager = ConnectionManager(idle: true)
-    private var commandManager = ConnectionManager()
+    private let idleManager = ConnectionManager(idle: true)
+    private let commandManager = ConnectionManager()
 
     private var isRunning = true
     private let retryConnectionInterval: UInt32 = 5
@@ -172,22 +173,16 @@ class ConnectionManager {
 }
 
 class PlayerResponse {
+    // TODO: Is @ObservationIgnored needed here?
     @ObservationIgnored var idleManager: ConnectionManager?
     @ObservationIgnored var commandManager: ConnectionManager?
 
-    func update<T: Equatable>(_ variable: inout T?, value: T?, notification: Notification.Name? = nil) {
+    func update<T: Equatable>(_ variable: inout T?, value: T?) {
         guard variable != value else {
             return
         }
 
         variable = value
-
-        if let notification {
-            NotificationCenter.default.post(
-                name: notification,
-                object: nil
-            )
-        }
     }
 }
 
@@ -205,11 +200,7 @@ class PlayerResponse {
         }
 
         update(&elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
-        update(
-            &isPlaying,
-            value: mpd_status_get_state(recv) == MPD_STATE_PLAY,
-            notification: Notification.Name("IsPlayingDidChangeNotification")
-        )
+        update(&isPlaying, value: mpd_status_get_state(recv) == MPD_STATE_PLAY)
         update(&isRandom, value: mpd_status_get_random(recv))
         update(&isRepeat, value: mpd_status_get_repeat(recv))
 
@@ -256,11 +247,7 @@ class PlayerResponse {
             update(&title, value: nil)
         }
         update(&duration, value: Double(mpd_song_get_duration(recv)))
-        update(
-            &location,
-            value: String(cString: mpd_song_get_uri(recv)),
-            notification: Notification.Name("LocationDidChangeNotification")
-        )
+        update(&location, value: String(cString: mpd_song_get_uri(recv)))
 
         mpd_song_free(recv)
     }

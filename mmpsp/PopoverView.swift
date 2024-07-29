@@ -43,7 +43,7 @@ struct PopoverView: View {
                 .scaleEffect(showInfo ? 1 : 0.7)
                 .opacity(showInfo ? 1 : 0)
                 .animation(.spring(), value: showInfo)
-                .position(x: 235, y: 15)
+                .position(x: 15, y: 15)
 
             Footer()
                 .frame(height: 80)
@@ -103,7 +103,7 @@ struct PopoverView: View {
             }
         }
         .onChange(of: player.status.isPlaying ?? false) {
-            showInfo = (player.status.isPlaying ?? false) || isHovering
+            showInfo = !(player.status.isPlaying ?? false) || isHovering
         }
         .onChange(of: player.song.location) {
             guard player.popoverIsOpen else {
