@@ -107,6 +107,8 @@ struct PopoverView: View {
         }
         .onChange(of: player.song.location) {
             guard player.popoverIsOpen else {
+                player.song.artwork = nil
+
                 return
             }
 
