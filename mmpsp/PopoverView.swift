@@ -57,7 +57,7 @@ struct PopoverView: View {
                 startRadius: 5,
                 endRadius: 55
             )
-            .offset(x: 20)
+            .offset(x: 23)
             .scaleEffect(x: 1.5)
         )
         .frame(width: 250, height: height)
