@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PopoverView: View {
     @Environment(Player.self) private var player
-    
+
     @State private var height = Double(250)
     @State private var isHovering = false
     @State private var showInfo = false
@@ -17,17 +17,16 @@ struct PopoverView: View {
     @State private var cursorPosition: CGPoint = .zero
     @State private var rotationX: Double = 0
     @State private var rotationY: Double = 0
-    
+
     private let willShowNotification = NotificationCenter.default
         .publisher(for: NSPopover.willShowNotification)
     private let didCloseNotification = NotificationCenter.default
         .publisher(for: NSPopover.didCloseNotification)
-        
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             Artwork()
-            
+
             Artwork()
                 .cornerRadius(10)
                 .rotation3DEffect(
@@ -45,13 +44,13 @@ struct PopoverView: View {
                 .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
                 .shadow(color: .black.opacity(0.2), radius: 16)
                 .background(.ultraThinMaterial)
-            
+
             Gear()
                 .scaleEffect(showInfo ? 1 : 0.7)
                 .opacity(showInfo ? 1 : 0)
                 .animation(.spring(), value: showInfo)
                 .position(x: 15, y: 15)
-            
+
             Footer()
                 .frame(height: 80)
                 .offset(y: showInfo ? 0 : 80)
@@ -75,10 +74,10 @@ struct PopoverView: View {
             Task {
                 await player.status.trackElapsed()
             }
-            
+
             var lastFireTime: DispatchTime = .now()
             let debounceInterval: TimeInterval = 0.05
-            
+
             cursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
                 let now = DispatchTime.now()
 
@@ -112,7 +111,7 @@ struct PopoverView: View {
         }
         .onReceive(didCloseNotification) { _ in
             player.status.stopTrackingElapsed()
-            
+
             if let monitor = cursorMonitor {
                 NSEvent.removeMonitor(monitor)
                 cursorMonitor = nil

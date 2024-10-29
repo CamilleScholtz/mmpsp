@@ -220,15 +220,15 @@ actor ConnectionManager {
 
         return (artist, title, location, duration)
     }
-    
+
     func getElapsedData() -> Double? {
         connect()
         defer { disconnect() }
-        
+
         guard let connection, let recv = mpd_run_status(connection) else {
             return nil
         }
-        
+
         return Double(mpd_status_get_elapsed_time(recv))
     }
 
@@ -247,7 +247,7 @@ actor ConnectionManager {
 
         while true {
             let recv = buffer.withUnsafeMutableBytes { bufferPtr in
-                return mpd_run_readpicture(connection, location, offset, bufferPtr.baseAddress, bufferSize)
+                mpd_run_readpicture(connection, location, offset, bufferPtr.baseAddress, bufferSize)
             }
             guard recv > 0 else {
                 break
