@@ -9,18 +9,25 @@ import SwiftUI
 
 struct PopoverView: View {
     @Environment(Player.self) private var player
-
+    
     @State private var height = Double(250)
     @State private var isHovering = false
     @State private var showInfo = false
+    @State private var cursorMonitor: Any?
     @State private var cursorPosition: CGPoint = .zero
     @State private var rotationX: Double = 0
     @State private var rotationY: Double = 0
-
+    
+    private let willShowNotification = NotificationCenter.default
+        .publisher(for: NSPopover.willShowNotification)
+    private let didCloseNotification = NotificationCenter.default
+        .publisher(for: NSPopover.didCloseNotification)
+        
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             Artwork()
-
+            
             Artwork()
                 .cornerRadius(10)
                 .rotation3DEffect(
@@ -38,13 +45,13 @@ struct PopoverView: View {
                 .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
                 .shadow(color: .black.opacity(0.2), radius: 16)
                 .background(.ultraThinMaterial)
-
+            
             Gear()
                 .scaleEffect(showInfo ? 1 : 0.7)
                 .opacity(showInfo ? 1 : 0)
                 .animation(.spring(), value: showInfo)
                 .position(x: 15, y: 15)
-
+            
             Footer()
                 .frame(height: 80)
                 .offset(y: showInfo ? 0 : 80)
@@ -61,17 +68,18 @@ struct PopoverView: View {
             .scaleEffect(x: 1.5)
         )
         .frame(width: 250, height: height)
-        .onChange(of: player.popoverIsOpen) {
-            guard player.popoverIsOpen else {
-                return
+        .onReceive(willShowNotification) { _ in
+            Task(priority: .high) {
+                await player.song.setArtwork()
             }
-
-            player.song.setArtwork()
-
+            Task {
+                await player.status.trackElapsed()
+            }
+            
             var lastFireTime: DispatchTime = .now()
-            let debounceInterval: TimeInterval = 0.2
-
-            NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
+            let debounceInterval: TimeInterval = 0.05
+            
+            cursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
                 let now = DispatchTime.now()
 
                 guard now > lastFireTime + debounceInterval, isHovering else {
@@ -94,26 +102,36 @@ struct PopoverView: View {
                 let xPercentage = Double(location.x / 250)
                 let yPercentage = Double(location.y / height)
 
-                rotationX = (yPercentage - 0.5) * -16
-                rotationY = (xPercentage - 0.5) * 16
+                rotationX = (yPercentage - 0.5) * -8
+                rotationY = (xPercentage - 0.5) * 8
 
                 lastFireTime = now
 
                 return event
             }
         }
-        .onChange(of: player.status.isPlaying ?? false) {
-            showInfo = !(player.status.isPlaying ?? false) || isHovering
+        .onReceive(didCloseNotification) { _ in
+            player.status.stopTrackingElapsed()
+            
+            if let monitor = cursorMonitor {
+                NSEvent.removeMonitor(monitor)
+                cursorMonitor = nil
+            }
+        }
+        .onChange(of: player.status.isPlaying ?? false) { _, value in
+            showInfo = !value || isHovering
         }
         .onChange(of: player.song.location) {
-            guard player.popoverIsOpen else {
+            guard AppDelegate.shared.popover.isShown else {
                 return
             }
 
-            player.song.setArtwork()
+            Task(priority: .high) {
+                await player.song.setArtwork()
+            }
         }
-        .onChange(of: player.song.artwork) {
-            guard player.song.artwork != nil else {
+        .onChange(of: player.song.artwork) { _, value in
+            guard value != nil else {
                 return
             }
 
@@ -210,7 +228,6 @@ struct Progress: View {
                         width: (player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250,
                         height: hover ? 8 : 4
                     )
-                    .blendMode(.softLight)
                     .animation(.spring(), value: player.status.elapsed)
 
                 Rectangle()
@@ -219,11 +236,13 @@ struct Progress: View {
                         width: Double.maximum(0, 250 - ((player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250)),
                         height: hover ? 8 : 4
                     )
-                    .blendMode(.softLight)
                     .animation(.spring(), value: player.status.elapsed)
             }
+            .blendMode(.softLight)
             .gesture(DragGesture(minimumDistance: 0).onChanged { value in
-                player.seek((value.location.x / 250) * (player.song.duration ?? 100))
+                Task(priority: .userInitiated) {
+                    await player.seek((value.location.x / 250) * (player.song.duration ?? 100))
+                }
             })
 
             HStack(alignment: .center) {
@@ -263,7 +282,9 @@ struct Pause: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.pause(player.status.isPlaying ?? false)
+                Task(priority: .userInitiated) {
+                    await player.pause(player.status.isPlaying ?? false)
+                }
             })
     }
 }
@@ -283,7 +304,9 @@ struct Previous: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.previous()
+                Task(priority: .userInitiated) {
+                    await player.previous()
+                }
             })
     }
 }
@@ -303,7 +326,9 @@ struct Next: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.next()
+                Task(priority: .userInitiated) {
+                    await player.next()
+                }
             })
     }
 }
@@ -325,7 +350,9 @@ struct Random: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.setRandom(!(player.status.isRandom ?? false))
+                Task(priority: .userInitiated) {
+                    await player.setRandom(!(player.status.isRandom ?? false))
+                }
             })
     }
 }
@@ -347,7 +374,9 @@ struct Repeat: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                player.setRepeat(!(player.status.isRepeat ?? false))
+                Task(priority: .userInitiated) {
+                    await player.setRepeat(!(player.status.isRepeat ?? false))
+                }
             })
     }
 }
