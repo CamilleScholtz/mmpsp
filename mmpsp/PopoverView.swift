@@ -122,6 +122,7 @@ struct PopoverView: View {
         }
         .onChange(of: player.song.location) {
             guard AppDelegate.shared.popover.isShown else {
+                player.song.artwork = nil
                 return
             }
 
