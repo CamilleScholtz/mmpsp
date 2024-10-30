@@ -10,124 +10,92 @@ import SwiftUI
 
 @Observable final class Player {
     // TODO: Is @ObservationIgnored needed here?
-    @ObservationIgnored let status = Status()
-    @ObservationIgnored let song = Song()
-
-    // TODO: Move popover specific logic to a superclass.
-    var popoverIsOpen = false
+    let status = Status()
+    let song = Song()
 
     private let idleManager = ConnectionManager(idle: true)
     private let commandManager = ConnectionManager()
 
-    private var isRunning = true
-    private let retryConnectionInterval: UInt32 = 5
+    private var updateLoopTask: Task<Void, Never>?
 
+    @MainActor
     init() {
         status.idleManager = idleManager
         status.commandManager = commandManager
         song.idleManager = idleManager
         song.commandManager = commandManager
 
-        startUpdateLoop()
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(popoverIsOpening),
-            name: NSPopover.willShowNotification,
-            object: nil
-        )
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(popoverIsClosing),
-            name: NSPopover.didCloseNotification,
-            object: nil
-        )
+        updateLoopTask = Task { [weak self] in
+            await self?.updateLoop()
+        }
     }
 
     deinit {
-        isRunning = false
+        updateLoopTask?.cancel()
     }
 
-    private func startUpdateLoop() {
-        DispatchQueue(label: "MPDIdleQueue").async { [weak self] in
-            guard let self else {
-                return
+    @MainActor
+    private func updateLoop() async {
+        while !Task.isCancelled {
+            if await (!idleManager.isConnected) {
+                await idleManager.connect()
+                if await (!idleManager.isConnected) {
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
+                    continue
+                }
             }
 
-            while isRunning {
-                if !idleManager.isConnected {
-                    idleManager.connect()
-                    if !idleManager.isConnected {
-                        sleep(retryConnectionInterval)
-                    }
-                }
+            await status.set()
+            await song.set()
 
-                DispatchQueue.main.sync {
-                    self.status.set()
-                    self.song.set()
-                }
+            let idleResult = await idleManager.runIdleMask(
+                mask: mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)
+            )
 
-                if mpd_run_idle_mask(idleManager.connection, mpd_idle(MPD_IDLE_PLAYER.rawValue | MPD_IDLE_OPTIONS.rawValue)) == mpd_idle(0) {
-                    idleManager.disconnect()
-                }
+            if idleResult == mpd_idle(0) {
+                await idleManager.disconnect()
             }
         }
     }
 
-    @objc func popoverIsOpening(_: NSNotification?) {
-        popoverIsOpen = true
-        status.trackElapsed()
+    @MainActor
+    func pause(_ value: Bool) async {
+        await commandManager.runPause(value)
     }
 
-    @objc func popoverIsClosing(_: NSNotification?) {
-        popoverIsOpen = false
-        status.timer?.invalidate()
+    @MainActor
+    func previous() async {
+        await commandManager.runPrevious()
     }
 
-    func pause(_ value: Bool) {
-        commandManager.execute { connection in
-            mpd_run_pause(connection, value)
-        }
+    @MainActor
+    func next() async {
+        await commandManager.runNext()
     }
 
-    func previous() {
-        commandManager.execute { connection in
-            mpd_run_previous(connection)
-        }
+    @MainActor
+    func seek(_ value: Double) async {
+        await commandManager.runSeekCurrent(value)
+        status.elapsed = value
     }
 
-    func next() {
-        commandManager.execute { connection in
-            mpd_run_next(connection)
-        }
+    @MainActor
+    func setRandom(_ value: Bool) async {
+        await commandManager.runRandom(value)
     }
 
-    func seek(_ value: Double) {
-        commandManager.execute { connection in
-            mpd_run_seek_current(connection, Float(value), false)
-        }
-    }
-
-    func setRandom(_ value: Bool) {
-        commandManager.execute { connection in
-            mpd_run_random(connection, value)
-        }
-    }
-
-    func setRepeat(_ value: Bool) {
-        commandManager.execute { connection in
-            mpd_run_repeat(connection, value)
-        }
+    @MainActor
+    func setRepeat(_ value: Bool) async {
+        await commandManager.runRepeat(value)
     }
 }
 
-class ConnectionManager {
+actor ConnectionManager {
     @AppStorage(Setting.host) var host = "localhost"
     @AppStorage(Setting.port) var port = 6600
 
-    var connection: OpaquePointer?
-    var isConnected: Bool = false
+    private var connection: OpaquePointer?
+    private(set) var isConnected: Bool = false
 
     private var idle: Bool
 
@@ -135,8 +103,15 @@ class ConnectionManager {
         self.idle = idle
     }
 
-    deinit {
-        disconnect()
+    private func run(_ action: (OpaquePointer) -> Void) {
+        connect()
+        defer { disconnect() }
+
+        guard let connection else {
+            return
+        }
+
+        action(connection)
     }
 
     func connect() {
@@ -155,34 +130,149 @@ class ConnectionManager {
     }
 
     func disconnect() {
-        guard connection != nil else {
+        guard let connection else {
             return
         }
 
         mpd_connection_free(connection)
-        connection = nil
+        self.connection = nil
 
         isConnected = false
     }
 
-    func execute(_ action: (OpaquePointer) -> Void) {
+    func runPause(_ value: Bool) {
+        run { connection in
+            mpd_run_pause(connection, value)
+        }
+    }
+
+    func runPrevious() {
+        run { connection in
+            mpd_run_previous(connection)
+        }
+    }
+
+    func runNext() {
+        run { connection in
+            mpd_run_next(connection)
+        }
+    }
+
+    func runSeekCurrent(_ value: Double) {
+        run { connection in
+            mpd_run_seek_current(connection, Float(value), false)
+        }
+    }
+
+    func runRandom(_ value: Bool) {
+        run { connection in
+            mpd_run_random(connection, value)
+        }
+    }
+
+    func runRepeat(_ value: Bool) {
+        run { connection in
+            mpd_run_repeat(connection, value)
+        }
+    }
+
+    func runIdleMask(mask: mpd_idle) -> mpd_idle {
+        guard let connection else {
+            return mpd_idle(0)
+        }
+        return mpd_run_idle_mask(connection, mask)
+    }
+
+    func getStatusData() -> (isPlaying: Bool?, isRandom: Bool?, isRepeat: Bool?, elapsed: Double?) {
+        guard let connection, let recv = mpd_run_status(connection) else {
+            return (nil, nil, nil, nil)
+        }
+
+        let isPlaying = mpd_status_get_state(recv) == MPD_STATE_PLAY
+        let isRandom = mpd_status_get_random(recv)
+        let isRepeat = mpd_status_get_repeat(recv)
+        let elapsed = Double(mpd_status_get_elapsed_time(recv))
+
+        mpd_status_free(recv)
+
+        return (isPlaying, isRandom, isRepeat, elapsed)
+    }
+
+    func getSongData() -> (artist: String?, title: String?, location: String?, duration: Double?) {
+        guard let connection, let recv = mpd_run_current_song(connection) else {
+            return (nil, nil, nil, nil)
+        }
+
+        var artist: String?
+        if let tag = mpd_song_get_tag(recv, MPD_TAG_ARTIST, 0) {
+            artist = String(cString: tag)
+        }
+
+        var title: String?
+        if let tag = mpd_song_get_tag(recv, MPD_TAG_TITLE, 0) {
+            title = String(cString: tag)
+        }
+
+        let duration = Double(mpd_song_get_duration(recv))
+        let location = String(cString: mpd_song_get_uri(recv))
+
+        mpd_song_free(recv)
+
+        return (artist, title, location, duration)
+    }
+
+    func getElapsedData() -> Double? {
         connect()
-        action(connection!)
-        disconnect()
+        defer { disconnect() }
+
+        guard let connection, let recv = mpd_run_status(connection) else {
+            return nil
+        }
+
+        return Double(mpd_status_get_elapsed_time(recv))
+    }
+
+    func getArtworkData(location: String?) -> Data? {
+        guard let location else {
+            return nil
+        }
+
+        var imageData = Data()
+        var offset: UInt32 = 0
+        let bufferSize = 1024 * 1024
+        var buffer = Data(count: bufferSize)
+
+        connect()
+        defer { disconnect() }
+
+        while true {
+            let recv = buffer.withUnsafeMutableBytes { bufferPtr in
+                mpd_run_readpicture(connection, location, offset, bufferPtr.baseAddress, bufferSize)
+            }
+            guard recv > 0 else {
+                break
+            }
+
+            imageData.append(buffer.prefix(Int(recv)))
+            offset += UInt32(recv)
+        }
+
+        return imageData
     }
 }
 
 class PlayerResponse {
-    // TODO: Is @ObservationIgnored needed here?
     @ObservationIgnored var idleManager: ConnectionManager?
     @ObservationIgnored var commandManager: ConnectionManager?
 
-    func update<T: Equatable>(_ variable: inout T?, value: T?) {
+    // TODO: Is this actually an optimization or not?
+    func update<T: Equatable>(_ variable: inout T?, value: T?) -> Bool {
         guard variable != value else {
-            return
+            return false
         }
 
         variable = value
+        return true
     }
 }
 
@@ -192,33 +282,51 @@ class PlayerResponse {
     var isRandom: Bool?
     var isRepeat: Bool?
 
-    @ObservationIgnored var timer: Timer?
+    @ObservationIgnored var trackingTask: Task<Void, Never>?
 
-    func set() {
-        guard let recv = mpd_run_status(idleManager!.connection) else {
+    @MainActor
+    func set() async {
+        guard let data = await idleManager?.getStatusData() else {
             return
         }
 
-        update(&elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
-        update(&isPlaying, value: mpd_status_get_state(recv) == MPD_STATE_PLAY)
-        update(&isRandom, value: mpd_status_get_random(recv))
-        update(&isRepeat, value: mpd_status_get_repeat(recv))
-
-        mpd_status_free(recv)
+        if update(&isPlaying, value: data.isPlaying) {
+            AppDelegate.shared.setPopoverAnchorImage(changed: data.isPlaying ?? false ? "play" : "pause")
+        }
+        if update(&isRandom, value: data.isRandom) {
+            AppDelegate.shared.setPopoverAnchorImage(changed: data.isRandom ?? false ? "random" : "sequential")
+        }
+        if update(&isRepeat, value: data.isRepeat) {
+            AppDelegate.shared.setPopoverAnchorImage(changed: data.isRepeat ?? false ? "repeat" : "single")
+        }
+        _ = data.elapsed
     }
 
-    func trackElapsed() {
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            self.commandManager!.execute { connection in
-                guard let recv = mpd_run_status(connection) else {
+    @MainActor
+    func trackElapsed() async {
+        if trackingTask?.isCancelled != nil {
+            stopTrackingElapsed()
+        }
+
+        trackingTask = Task { [weak self] in
+            guard let self else {
+                return
+            }
+
+            while !Task.isCancelled {
+                guard let data = await commandManager?.getElapsedData() else {
                     return
                 }
 
-                self.update(&self.elapsed, value: Double(mpd_status_get_elapsed_time(recv)))
+                elapsed = data
 
-                mpd_status_free(recv)
+                try? await Task.sleep(nanoseconds: 500_000_000)
             }
         }
+    }
+
+    func stopTrackingElapsed() {
+        trackingTask?.cancel()
     }
 }
 
@@ -231,49 +339,26 @@ class PlayerResponse {
 
     var description: String { "\(artist ?? "Unknown artist") - \(title ?? "Unknown title")" }
 
-    func set() {
-        guard let recv = mpd_run_current_song(idleManager!.connection) else {
+    @MainActor
+    func set() async {
+        guard let data = await idleManager?.getSongData() else {
             return
         }
 
-        if let tag = mpd_song_get_tag(recv, MPD_TAG_ARTIST, 0) {
-            update(&artist, value: String(cString: tag))
-        } else {
-            update(&artist, value: nil)
+        _ = update(&artist, value: data.artist)
+        _ = update(&title, value: data.title)
+        _ = update(&duration, value: data.duration)
+        if update(&location, value: data.location) {
+            AppDelegate.shared.setStatusItemTitle()
         }
-        if let tag = mpd_song_get_tag(recv, MPD_TAG_TITLE, 0) {
-            update(&title, value: String(cString: tag))
-        } else {
-            update(&title, value: nil)
-        }
-        update(&duration, value: Double(mpd_song_get_duration(recv)))
-        update(&location, value: String(cString: mpd_song_get_uri(recv)))
-
-        mpd_song_free(recv)
     }
 
-    func setArtwork() {
-        guard location != nil else {
+    @MainActor
+    func setArtwork() async {
+        guard let data = await commandManager?.getArtworkData(location: location) else {
             return
         }
 
-        var imageData = Data()
-        var offset: UInt32 = 0
-        let bufferSize = 1024 * 1024
-        var buffer = [UInt8](repeating: 0, count: bufferSize)
-
-        commandManager!.execute { connection in
-            while true {
-                let recv = mpd_run_readpicture(connection, location!, offset, &buffer, bufferSize)
-                if recv < 1 {
-                    break
-                }
-
-                imageData.append(contentsOf: buffer[..<Int(recv)])
-                offset += UInt32(recv)
-            }
-        }
-
-        update(&artwork, value: NSImage(data: imageData))
+        artwork = NSImage(data: data)
     }
 }

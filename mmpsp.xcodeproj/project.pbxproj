@@ -10,11 +10,10 @@
 		9130148226A5B42100755B7D /* Animation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130148126A5B42100755B7D /* Animation.swift */; };
 		9136948F2A890EFD00015DFA /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9136948E2A890EFD00015DFA /* AppIcon.icns */; };
 		915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915A7CF327A877ED00B23398 /* SettingsView.swift */; };
-		916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E22A7ECB290074452B /* libmpdclient */; };
 		916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 916AE9E52A7ED1C80074452B /* LaunchAtLogin */; };
 		916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18925AA7D84001321B5 /* AppDelegate.swift */; };
 		916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DB18B25AA7D84001321B5 /* PopoverView.swift */; };
-		91A4C3EB2C57D3DA00612A1F /* WithContinuousObservationTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A4C3EA2C57D3DA00612A1F /* WithContinuousObservationTracking.swift */; };
+		91849C362CCDA592009BBD9B /* libmpdclient in Frameworks */ = {isa = PBXBuildFile; productRef = 91849C352CCDA592009BBD9B /* libmpdclient */; };
 		91ABBCCC268A0EAD00D19910 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91ABBCCB268A0EAD00D19910 /* Double.swift */; };
 		91BD538025AF8A3F0080C788 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BD537F25AF8A3F0080C788 /* Player.swift */; };
 /* End PBXBuildFile section */
@@ -29,7 +28,6 @@
 		916DB19225AA7D86001321B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		919E4EEC26939DBA0001B272 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		919E4EED2693AA060001B272 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = "<group>"; };
-		91A4C3EA2C57D3DA00612A1F /* WithContinuousObservationTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithContinuousObservationTracking.swift; sourceTree = "<group>"; };
 		91A756A92667C4A700181D8C /* mmpsp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = mmpsp.entitlements; sourceTree = "<group>"; };
 		91ABBCCB268A0EAD00D19910 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
 		91BD537F25AF8A3F0080C788 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
@@ -41,7 +39,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				916AE9E62A7ED1C80074452B /* LaunchAtLogin in Frameworks */,
-				916AE9E32A7ECB290074452B /* libmpdclient in Frameworks */,
+				91849C362CCDA592009BBD9B /* libmpdclient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,7 +92,6 @@
 			children = (
 				91ABBCCB268A0EAD00D19910 /* Double.swift */,
 				9130148126A5B42100755B7D /* Animation.swift */,
-				91A4C3EA2C57D3DA00612A1F /* WithContinuousObservationTracking.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -116,8 +113,8 @@
 			);
 			name = mmpsp;
 			packageProductDependencies = (
-				916AE9E22A7ECB290074452B /* libmpdclient */,
 				916AE9E52A7ED1C80074452B /* LaunchAtLogin */,
+				91849C352CCDA592009BBD9B /* libmpdclient */,
 			);
 			productName = mpdPopup;
 			productReference = 916DB18625AA7D84001321B5 /* mmpsp.app */;
@@ -148,8 +145,8 @@
 			);
 			mainGroup = 916DB17D25AA7D84001321B5;
 			packageReferences = (
-				916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */,
 				916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				91849C342CCDA592009BBD9B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */,
 			);
 			productRefGroup = 916DB18725AA7D84001321B5 /* Products */;
 			projectDirPath = "";
@@ -176,7 +173,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				91A4C3EB2C57D3DA00612A1F /* WithContinuousObservationTracking.swift in Sources */,
 				916DB18C25AA7D84001321B5 /* PopoverView.swift in Sources */,
 				916DB18A25AA7D84001321B5 /* AppDelegate.swift in Sources */,
 				915A7CF427A877ED00B23398 /* SettingsView.swift in Sources */,
@@ -251,7 +247,7 @@
 				SKIP_INSTALL = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -313,7 +309,7 @@
 				SKIP_INSTALL = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -340,13 +336,13 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.5;
-				MARKETING_VERSION = v0.3;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = v0.4;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.mmpsp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -373,13 +369,13 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.5;
-				MARKETING_VERSION = v0.3;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = v0.4;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.camille.mmpsp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -407,14 +403,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/katoemba/libmpdclient-swift";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
@@ -423,18 +411,26 @@
 				kind = branch;
 			};
 		};
+		91849C342CCDA592009BBD9B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/zluo01/libmpdclient-swift";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		916AE9E22A7ECB290074452B /* libmpdclient */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 916AE9E12A7ECB290074452B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */;
-			productName = libmpdclient;
-		};
 		916AE9E52A7ED1C80074452B /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 916AE9E42A7ED1C70074452B /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
+		};
+		91849C352CCDA592009BBD9B /* libmpdclient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91849C342CCDA592009BBD9B /* XCRemoteSwiftPackageReference "libmpdclient-swift" */;
+			productName = libmpdclient;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

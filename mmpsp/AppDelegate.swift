@@ -7,7 +7,8 @@
 
 import SwiftUI
 
-@main struct MusicPlayerPopupApp: App {
+@main
+struct MusicPlayerPopupApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
@@ -17,16 +18,21 @@ import SwiftUI
     }
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private(set) static var shared: AppDelegate!
+
     private var player = Player()
 
-    private var popoverAnchor: NSStatusItem!
-    private var statusItem: NSStatusItem!
-    var popover = NSPopover()
+    private lazy var popoverAnchor = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+    private lazy var statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    let popover = NSPopover()
 
     private var changeImageWorkItem: DispatchWorkItem?
 
     func applicationDidFinishLaunching(_: Notification) {
+        AppDelegate.shared = self
+
         configureStatusItem()
         configurePopover()
 
@@ -39,17 +45,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func configureStatusItem() {
-        popoverAnchor = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        popoverAnchor.button!.action = #selector(buttonAction)
         popoverAnchor.button!.sendAction(on: [.leftMouseDown, .rightMouseDown, .scrollWheel])
+        popoverAnchor.button!.action = #selector(buttonAction)
 
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button!.action = #selector(buttonAction)
         statusItem.button!.sendAction(on: [.leftMouseDown, .rightMouseDown, .scrollWheel])
+        statusItem.button!.action = #selector(buttonAction)
 
-        withContinuousObservationTracking(of: self.player.song.location) { _ in
-            self.setStatusItemTitle()
-        }
+        setPopoverAnchorImage()
     }
 
     private func configurePopover() {
@@ -59,19 +61,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: PopoverView()
                 .environment(player)
         )
-
-        withContinuousObservationTracking(of: self.player.status.isPlaying) { value in
-            self.setPopoverAnchorImage(changed: (value ?? false) ? "play" : "pause")
-        }
-        withContinuousObservationTracking(of: self.player.status.isRandom) { value in
-            self.setPopoverAnchorImage(changed: (value ?? false) ? "random" : "sequential")
-        }
-        withContinuousObservationTracking(of: self.player.status.isRepeat) { value in
-            self.setPopoverAnchorImage(changed: (value ?? false) ? "repeat" : nil)
-        }
     }
 
-    private func setPopoverAnchorImage(changed: String? = nil) {
+    public func setPopoverAnchorImage(changed: String? = nil) {
         switch changed {
         case "play":
             popoverAnchor.button!.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "play")
@@ -83,6 +75,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popoverAnchor.button!.image = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "sequential")
         case "repeat":
             popoverAnchor.button!.image = NSImage(systemSymbolName: "repeat", accessibilityDescription: "repeat")
+        case "singe":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "return", accessibilityDescription: "singe")
         default:
             return popoverAnchor.button!.image = NSImage(systemSymbolName: "music.note", accessibilityDescription: "mmpsp")
         }
@@ -97,13 +91,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func setStatusItemTitle() {
+    public func setStatusItemTitle() {
         var description = player.song.description
         if description.count > 80 {
             description = String(description.prefix(80)) + "…"
         }
 
-        statusItem!.button!.title = description
+        statusItem.button!.title = description
     }
 
     private func togglePopover(_ sender: NSStatusBarButton?) {
@@ -129,12 +123,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    @objc func handleTerminate(_: Notification) {
+    @objc private func handleTerminate(_: Notification) {
         popover.performClose(nil)
         NSApplication.shared.terminate(self)
     }
 
-    @objc func buttonAction(_ sender: NSStatusBarButton?) {
+    @objc private func buttonAction(_ sender: NSStatusBarButton?) {
         guard let event = NSApp.currentEvent else {
             return
         }
@@ -142,7 +136,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // TODO: `case .scrollWheel` doesn't work.
         switch event.type {
         case .rightMouseDown:
-            player.pause(player.status.isPlaying!)
+            Task(priority: .userInitiated) { @MainActor in
+                await player.pause(player.status.isPlaying ?? false)
+            }
         default:
             togglePopover(sender)
         }
