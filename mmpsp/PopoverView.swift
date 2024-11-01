@@ -10,6 +10,9 @@ import SwiftUI
 struct PopoverView: View {
     @Environment(Player.self) private var player
 
+    @State private var previousArtwork: NSImage?
+    @State private var isBackgroundArtworkTransitioning = false
+    @State private var isArtworkTransitioning = false
     @State private var height = Double(250)
     @State private var isHovering = false
     @State private var showInfo = false
@@ -25,36 +28,50 @@ struct PopoverView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Artwork()
+            ZStack(alignment: .bottom) {
+                Artwork(image: player.song.artwork ?? NSImage())
 
-            Artwork()
-                .cornerRadius(10)
-                .rotation3DEffect(
-                    Angle(degrees: rotationX),
-                    axis: (x: 1.0, y: 0.0, z: 0.0)
-                )
-                .rotation3DEffect(
-                    Angle(degrees: rotationY),
-                    axis: (x: 0.0, y: 1.0, z: 0.0)
-                )
-                .animation(.spring(), value: rotationX)
-                .animation(.spring(), value: rotationY)
-                .scaleEffect(showInfo ? 0.7 : 1)
-                .offset(y: showInfo ? -7 : 0)
-                .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
-                .shadow(color: .black.opacity(0.2), radius: 16)
-                .background(.ultraThinMaterial)
+                if let artwork = previousArtwork {
+                    Artwork(image: artwork)
+                        .opacity(isBackgroundArtworkTransitioning ? 1 : 0)
+                }
+            }
+
+            ZStack(alignment: .bottom) {
+                Artwork(image: player.song.artwork ?? NSImage())
+
+                if let artwork = previousArtwork {
+                    Artwork(image: artwork)
+                        .opacity(isArtworkTransitioning ? 1 : 0)
+                }
+            }
+            .cornerRadius(10)
+            .rotation3DEffect(
+                Angle(degrees: rotationX),
+                axis: (x: 1.0, y: 0.0, z: 0.0)
+            )
+            .rotation3DEffect(
+                Angle(degrees: rotationY),
+                axis: (x: 0.0, y: 1.0, z: 0.0)
+            )
+            .animation(.spring, value: rotationX)
+            .animation(.spring, value: rotationY)
+            .scaleEffect(showInfo ? 0.7 : 1)
+            .offset(y: showInfo ? -7 : 0)
+            .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
+            .shadow(color: .black.opacity(0.2), radius: 16)
+            .background(.ultraThinMaterial)
 
             Gear()
                 .scaleEffect(showInfo ? 1 : 0.7)
                 .opacity(showInfo ? 1 : 0)
-                .animation(.spring(), value: showInfo)
+                .animation(.spring, value: showInfo)
                 .position(x: 15, y: 15)
 
             Footer()
                 .frame(height: 80)
                 .offset(y: showInfo ? 0 : 80)
-                .animation(.spring(), value: showInfo)
+                .animation(.spring, value: showInfo)
         }
         .mask(
             RadialGradient(
@@ -75,52 +92,14 @@ struct PopoverView: View {
                 await player.status.trackElapsed()
             }
 
-            var lastFireTime: DispatchTime = .now()
-            let debounceInterval: TimeInterval = 0.05
-
-            cursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
-                let now = DispatchTime.now()
-
-                guard now > lastFireTime + debounceInterval, isHovering else {
-                    return event
-                }
-
-                var location = event.locationInWindow
-
-                if event.window == nil {
-                    guard let frame = NSApp.keyWindow?.frame else {
-                        return event
-                    }
-
-                    location = CGPoint(
-                        x: location.x - frame.origin.x,
-                        y: location.y - frame.origin.y
-                    )
-                }
-
-                let xPercentage = Double(location.x / 250)
-                let yPercentage = Double(location.y / height)
-
-                rotationX = (yPercentage - 0.5) * -8
-                rotationY = (xPercentage - 0.5) * 8
-
-                lastFireTime = now
-
-                return event
-            }
+            setupCursorMonitor()
         }
         .onReceive(didCloseNotification) { _ in
             player.status.stopTrackingElapsed()
 
-            if let monitor = cursorMonitor {
-                NSEvent.removeMonitor(monitor)
-                cursorMonitor = nil
-            }
+            removeCursorMonitor()
         }
-        .onChange(of: player.status.isPlaying ?? false) { _, value in
-            showInfo = !value || isHovering
-        }
-        .onChange(of: player.song.location) {
+        .onChange(of: player.song.location) { _, _ in
             guard AppDelegate.shared.popover.isShown else {
                 player.song.artwork = nil
                 return
@@ -129,8 +108,21 @@ struct PopoverView: View {
             Task(priority: .high) {
                 await player.song.setArtwork()
             }
+
+            withAnimation {}
         }
-        .onChange(of: player.song.artwork) { _, value in
+        .onChange(of: player.song.artwork) { previous, value in
+            previousArtwork = previous
+
+            isBackgroundArtworkTransitioning = true
+            withAnimation(.easeInOut(duration: 0.5)) {
+                isBackgroundArtworkTransitioning = false
+            }
+            isArtworkTransitioning = true
+            withAnimation(.easeInOut(duration: 0.1)) {
+                isArtworkTransitioning = false
+            }
+
             guard value != nil else {
                 return
             }
@@ -157,6 +149,51 @@ struct PopoverView: View {
         }
     }
 
+    private func setupCursorMonitor() {
+        var lastFireTime: DispatchTime = .now()
+        let debounceInterval: TimeInterval = 0.05
+
+        cursorMonitor = NSEvent.addLocalMonitorForEvents(matching: [.mouseMoved]) { event in
+            let now = DispatchTime.now()
+
+            guard now > lastFireTime + debounceInterval, isHovering else {
+                return event
+            }
+
+            var location = event.locationInWindow
+
+            if event.window == nil {
+                guard let frame = NSApp.keyWindow?.frame else {
+                    return event
+                }
+
+                location = CGPoint(
+                    x: location.x - frame.origin.x,
+                    y: location.y - frame.origin.y
+                )
+            }
+
+            let xPercentage = Double(location.x / 250)
+            let yPercentage = Double(location.y / height)
+
+            rotationX = (yPercentage - 0.5) * -8
+            rotationY = (xPercentage - 0.5) * 8
+
+            lastFireTime = now
+
+            return event
+        }
+    }
+
+    private func removeCursorMonitor() {
+        guard let monitor = cursorMonitor else {
+            return
+        }
+
+        NSEvent.removeMonitor(monitor)
+        cursorMonitor = nil
+    }
+
     private func updateHeight() {
         guard let artwork = player.song.artwork else {
             height = 250
@@ -167,10 +204,10 @@ struct PopoverView: View {
 }
 
 struct Artwork: View {
-    @Environment(Player.self) private var player
+    let image: NSImage
 
     var body: some View {
-        Image(nsImage: player.song.artwork ?? NSImage())
+        Image(nsImage: image)
             .resizable()
             .aspectRatio(contentMode: .fill)
             .frame(width: 250)
@@ -228,7 +265,7 @@ struct Progress: View {
                         width: (player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250,
                         height: hover ? 8 : 4
                     )
-                    .animation(.spring(), value: player.status.elapsed)
+                    .animation(.spring, value: player.status.elapsed)
 
                 Rectangle()
                     .fill(Color(.textBackgroundColor))
@@ -236,7 +273,7 @@ struct Progress: View {
                         width: Double.maximum(0, 250 - ((player.status.elapsed ?? 0) / (player.song.duration ?? 100) * 250)),
                         height: hover ? 8 : 4
                     )
-                    .animation(.spring(), value: player.status.elapsed)
+                    .animation(.spring, value: player.status.elapsed)
             }
             .blendMode(.softLight)
             .gesture(DragGesture(minimumDistance: 0).onChanged { value in
@@ -259,7 +296,7 @@ struct Progress: View {
                     .offset(x: -5, y: 3)
             }
         }
-        .animation(.interactiveSpring(), value: hover)
+        .animation(.interactiveSpring, value: hover)
         .onHover(perform: { value in
             hover = value
         })
@@ -277,7 +314,7 @@ struct Pause: View {
             .font(.system(size: 35))
             .blendMode(.overlay)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
@@ -299,7 +336,7 @@ struct Previous: View {
             .blendMode(.overlay)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
@@ -321,7 +358,7 @@ struct Next: View {
             .blendMode(.overlay)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
@@ -342,10 +379,10 @@ struct Random: View {
         Image(systemName: "shuffle")
             .foregroundColor(Color(player.status.isRandom ?? false ? .textBackgroundColor : .textColor))
             .blendMode(.overlay)
-            .animation(.interactiveSpring(), value: player.status.isRandom ?? false)
+            .animation(.interactiveSpring, value: player.status.isRandom ?? false)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
@@ -366,10 +403,10 @@ struct Repeat: View {
         Image(systemName: "repeat")
             .foregroundColor(Color(player.status.isRepeat ?? false ? .textBackgroundColor : .textColor))
             .blendMode(.overlay)
-            .animation(.interactiveSpring(), value: player.status.isRepeat ?? false)
+            .animation(.interactiveSpring, value: player.status.isRepeat ?? false)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
@@ -389,7 +426,7 @@ struct Gear: View {
             .blendMode(.overlay)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
-            .animation(.interactiveSpring(), value: hover)
+            .animation(.interactiveSpring, value: hover)
             .onHover(perform: { value in
                 hover = value
             })
