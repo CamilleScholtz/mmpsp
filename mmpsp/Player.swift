@@ -299,34 +299,22 @@ class PlayerResponse {
         if update(&isRepeat, value: data.isRepeat) {
             AppDelegate.shared.setPopoverAnchorImage(changed: data.isRepeat ?? false ? "repeat" : "single")
         }
-        _ = data.elapsed
+        elapsed = data.elapsed
     }
 
     @MainActor
     func trackElapsed() async {
-        if trackingTask?.isCancelled != nil {
-            stopTrackingElapsed()
-        }
+        trackingTask?.cancel()
 
         trackingTask = Task { [weak self] in
-            guard let self else {
-                return
-            }
-
             while !Task.isCancelled {
-                guard let data = await commandManager?.getElapsedData() else {
-                    return
+                if let elapsedData = await self?.commandManager?.getElapsedData() {
+                    self?.elapsed = elapsedData
                 }
-
-                elapsed = data
 
                 try? await Task.sleep(nanoseconds: 500_000_000)
             }
         }
-    }
-
-    func stopTrackingElapsed() {
-        trackingTask?.cancel()
     }
 }
 
@@ -358,6 +346,11 @@ class PlayerResponse {
         guard let data = await commandManager?.getArtworkData(location: location) else {
             return
         }
+
+        // TODO: iS there is a more efficient way of doing this?
+        // if new?.tiffRepresentation == artwork?.tiffRepresentation {
+        //     return
+        // }
 
         artwork = NSImage(data: data)
     }

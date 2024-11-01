@@ -10,14 +10,18 @@ import SwiftUI
 struct PopoverView: View {
     @Environment(Player.self) private var player
 
+    @State private var height = Double(250)
+
     @State private var previousArtwork: NSImage?
     @State private var isBackgroundArtworkTransitioning = false
     @State private var isArtworkTransitioning = false
-    @State private var height = Double(250)
+
     @State private var isHovering = false
     @State private var showInfo = false
+    
     @State private var cursorMonitor: Any?
     @State private var cursorPosition: CGPoint = .zero
+
     @State private var rotationX: Double = 0
     @State private var rotationY: Double = 0
 
@@ -28,39 +32,34 @@ struct PopoverView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            ZStack(alignment: .bottom) {
-                Artwork(image: player.song.artwork ?? NSImage())
-
-                if let artwork = previousArtwork {
-                    Artwork(image: artwork)
+            Artwork(image: player.song.artwork ?? NSImage())
+                .overlay(
+                    Artwork(image: previousArtwork ?? NSImage())
                         .opacity(isBackgroundArtworkTransitioning ? 1 : 0)
-                }
-            }
+                )
+                .opacity(0.25)
 
-            ZStack(alignment: .bottom) {
-                Artwork(image: player.song.artwork ?? NSImage())
-
-                if let artwork = previousArtwork {
-                    Artwork(image: artwork)
+            Artwork(image: player.song.artwork ?? NSImage())
+                .overlay(
+                    Artwork(image: previousArtwork ?? NSImage())
                         .opacity(isArtworkTransitioning ? 1 : 0)
-                }
-            }
-            .cornerRadius(10)
-            .rotation3DEffect(
-                Angle(degrees: rotationX),
-                axis: (x: 1.0, y: 0.0, z: 0.0)
-            )
-            .rotation3DEffect(
-                Angle(degrees: rotationY),
-                axis: (x: 0.0, y: 1.0, z: 0.0)
-            )
-            .animation(.spring, value: rotationX)
-            .animation(.spring, value: rotationY)
-            .scaleEffect(showInfo ? 0.7 : 1)
-            .offset(y: showInfo ? -7 : 0)
-            .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
-            .shadow(color: .black.opacity(0.2), radius: 16)
-            .background(.ultraThinMaterial)
+                )
+                .cornerRadius(10)
+                .rotation3DEffect(
+                    Angle(degrees: rotationX),
+                    axis: (x: 1.0, y: 0.0, z: 0.0)
+                )
+                .rotation3DEffect(
+                    Angle(degrees: rotationY),
+                    axis: (x: 0.0, y: 1.0, z: 0.0)
+                )
+                .animation(.spring, value: rotationX)
+                .animation(.spring, value: rotationY)
+                .scaleEffect(showInfo ? 0.7 : 1)
+                .offset(y: showInfo ? -7 : 0)
+                .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
+                .shadow(color: .black.opacity(0.2), radius: 16)
+                .background(.ultraThinMaterial)
 
             Gear()
                 .scaleEffect(showInfo ? 1 : 0.7)
@@ -95,7 +94,7 @@ struct PopoverView: View {
             setupCursorMonitor()
         }
         .onReceive(didCloseNotification) { _ in
-            player.status.stopTrackingElapsed()
+            player.status.trackingTask?.cancel()
 
             removeCursorMonitor()
         }
@@ -108,10 +107,8 @@ struct PopoverView: View {
             Task(priority: .high) {
                 await player.song.setArtwork()
             }
-
-            withAnimation {}
         }
-        .onChange(of: player.song.artwork) { previous, value in
+        .onChange(of: player.song.artwork) { previous, _ in
             previousArtwork = previous
 
             isBackgroundArtworkTransitioning = true
@@ -121,10 +118,6 @@ struct PopoverView: View {
             isArtworkTransitioning = true
             withAnimation(.easeInOut(duration: 0.1)) {
                 isArtworkTransitioning = false
-            }
-
-            guard value != nil else {
-                return
             }
 
             updateHeight()
@@ -199,6 +192,7 @@ struct PopoverView: View {
             height = 250
             return
         }
+
         height = (Double(artwork.size.height) / Double(artwork.size.width) * 250).rounded(.down)
     }
 }
