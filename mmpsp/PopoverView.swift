@@ -24,6 +24,8 @@ struct PopoverView: View {
 
     @State private var rotationX: Double = 0
     @State private var rotationY: Double = 0
+    
+    @State private var showSettings: Bool = false
 
     private let willShowNotification = NotificationCenter.default
         .publisher(for: NSPopover.willShowNotification)
@@ -31,114 +33,118 @@ struct PopoverView: View {
         .publisher(for: NSPopover.didCloseNotification)
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Artwork(image: player.song.artwork)
-                .overlay(
-                    previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
-                        .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
+        if !showSettings {
+            ZStack(alignment: .bottom) {
+                Artwork(image: player.song.artwork)
+                    .overlay(
+                        previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
+                            .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
+                    )
+                    .opacity(0.3)
+                
+                Artwork(image: player.song.artwork)
+                    .overlay(
+                        previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
+                            .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
+                    )
+                    .cornerRadius(10)
+                    .rotation3DEffect(
+                        Angle(degrees: rotationX),
+                        axis: (x: 1.0, y: 0.0, z: 0.0)
+                    )
+                    .rotation3DEffect(
+                        Angle(degrees: rotationY),
+                        axis: (x: 0.0, y: 1.0, z: 0.0)
+                    )
+                    .animation(.spring, value: rotationX)
+                    .animation(.spring, value: rotationY)
+                    .scaleEffect(showInfo ? 0.7 : 1)
+                    .offset(y: showInfo ? -7 : 0)
+                    .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
+                    .shadow(color: .black.opacity(0.2), radius: 16)
+                    .background(.ultraThinMaterial)
+                
+                Gear(showSettings: $showSettings)
+                    .scaleEffect(showInfo ? 1 : 0.7)
+                    .opacity(showInfo ? 1 : 0)
+                    .animation(.spring, value: showInfo)
+                    .position(x: 15, y: 15)
+                
+                Footer()
+                    .frame(height: 80)
+                    .offset(y: showInfo ? 0 : 80)
+                    .animation(.spring, value: showInfo)
+            }
+            .mask(
+                RadialGradient(
+                    gradient: Gradient(colors: [.clear, .white]),
+                    center: .top,
+                    startRadius: 5,
+                    endRadius: 55
                 )
-                .opacity(0.3)
-
-            Artwork(image: player.song.artwork)
-                .overlay(
-                    previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
-                        .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
-                )
-                .cornerRadius(10)
-                .rotation3DEffect(
-                    Angle(degrees: rotationX),
-                    axis: (x: 1.0, y: 0.0, z: 0.0)
-                )
-                .rotation3DEffect(
-                    Angle(degrees: rotationY),
-                    axis: (x: 0.0, y: 1.0, z: 0.0)
-                )
-                .animation(.spring, value: rotationX)
-                .animation(.spring, value: rotationY)
-                .scaleEffect(showInfo ? 0.7 : 1)
-                .offset(y: showInfo ? -7 : 0)
-                .animation(.spring(response: 0.7, dampingFraction: 1, blendDuration: 0.7), value: showInfo)
-                .shadow(color: .black.opacity(0.2), radius: 16)
-                .background(.ultraThinMaterial)
-
-            Gear()
-                .scaleEffect(showInfo ? 1 : 0.7)
-                .opacity(showInfo ? 1 : 0)
-                .animation(.spring, value: showInfo)
-                .position(x: 15, y: 15)
-
-            Footer()
-                .frame(height: 80)
-                .offset(y: showInfo ? 0 : 80)
-                .animation(.spring, value: showInfo)
-        }
-        .mask(
-            RadialGradient(
-                gradient: Gradient(colors: [.clear, .white]),
-                center: .top,
-                startRadius: 5,
-                endRadius: 55
+                .offset(x: 23)
+                .scaleEffect(x: 1.5)
             )
-            .offset(x: 23)
-            .scaleEffect(x: 1.5)
-        )
-        .frame(width: 250, height: height)
-        .onReceive(willShowNotification) { _ in
-            Task(priority: .userInitiated) {
-                await player.song.setArtwork()
-            }
-            Task {
-                await player.status.trackElapsed()
-            }
-
-            setupCursorMonitor()
-        }
-        .onReceive(didCloseNotification) { _ in
-            player.status.trackingTask?.cancel()
-
-            removeCursorMonitor()
-        }
-        .onChange(of: player.song.location) { _, _ in
-            guard AppDelegate.shared.popover.isShown else {
-                player.song.artwork = nil
-                return
-            }
-
-            Task(priority: .userInitiated) {
-                await player.song.setArtwork()
-            }
-        }
-        .onChange(of: player.song.artwork) { previous, _ in
-            previousArtwork = previous
-
-            isBackgroundArtworkTransitioning = true
-            withAnimation(.easeInOut(duration: 0.5)) {
-                isBackgroundArtworkTransitioning = false
-            }
-            isArtworkTransitioning = true
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isArtworkTransitioning = false
-            }
-
-            updateHeight()
-        }
-        .onHover { value in
-            if !value {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    if !isHovering {
-                        showInfo = false || !(player.status.isPlaying ?? false)
-                    }
+            .frame(width: 250, height: height)
+            .onReceive(willShowNotification) { _ in
+                Task(priority: .userInitiated) {
+                    await player.song.setArtwork()
                 }
-            } else {
-                showInfo = true
+                Task {
+                    await player.status.trackElapsed()
+                }
+                
+                setupCursorMonitor()
             }
-
-            isHovering = value
-
-            if !value {
-                rotationX = 0
-                rotationY = 0
+            .onReceive(didCloseNotification) { _ in
+                player.status.trackingTask?.cancel()
+                
+                removeCursorMonitor()
             }
+            .onChange(of: player.song.location) { _, _ in
+                guard AppDelegate.shared.popover.isShown else {
+                    player.song.artwork = nil
+                    return
+                }
+                
+                Task(priority: .userInitiated) {
+                    await player.song.setArtwork()
+                }
+            }
+            .onChange(of: player.song.artwork) { previous, _ in
+                previousArtwork = previous
+                
+                isBackgroundArtworkTransitioning = true
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    isBackgroundArtworkTransitioning = false
+                }
+                isArtworkTransitioning = true
+                withAnimation(.easeInOut(duration: 0.1)) {
+                    isArtworkTransitioning = false
+                }
+                
+                updateHeight()
+            }
+            .onHover { value in
+                if !value {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if !isHovering {
+                            showInfo = false || !(player.status.isPlaying ?? false)
+                        }
+                    }
+                } else {
+                    showInfo = true
+                }
+                
+                isHovering = value
+                
+                if !value {
+                    rotationX = 0
+                    rotationY = 0
+                }
+            }
+        } else {
+            SettingsView(showSettings: $showSettings)
         }
     }
 
@@ -421,10 +427,12 @@ struct Repeat: View {
 }
 
 struct Gear: View {
+    @Binding var showSettings: Bool
+    
     @State private var hover = false
 
     var body: some View {
-        Image(systemName: "gear")
+        Image(systemName: showSettings ? "xmark.circle.fill" : "gear")
             .blendMode(.overlay)
             .padding(10)
             .scaleEffect(hover ? 1.2 : 1)
@@ -433,7 +441,7 @@ struct Gear: View {
                 hover = value
             })
             .onTapGesture(perform: {
-                NSApp.keyWindow?.contentViewController?.presentAsSheet(NSHostingController(rootView: SettingsView()))
+                showSettings = !showSettings
             })
     }
 }

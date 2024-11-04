@@ -17,8 +17,13 @@ struct SettingsView: View {
     @AppStorage(Setting.host) var host = "localhost"
     @AppStorage(Setting.port) var port = 6600
 
+    @Binding var showSettings: Bool
+    
     var body: some View {
-        HStack {
+        ZStack(alignment: .bottom) {
+            Gear(showSettings: $showSettings)
+                .position(x: 15, y: 15)
+            
             Form {
                 Spacer()
 
@@ -34,10 +39,6 @@ struct SettingsView: View {
                 Spacer()
 
                 HStack {
-                    Button("Close") {
-                        NSApp.keyWindow?.close()
-                    }
-
                     Button("Exit app") {
                         NSApp.keyWindow?.close()
                         NotificationCenter.default.post(
@@ -49,8 +50,8 @@ struct SettingsView: View {
                     .cornerRadius(5)
                 }
             }
+            .padding(20)
         }
-        .padding(20)
         .frame(width: 250, height: 250)
     }
 }

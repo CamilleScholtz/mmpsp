@@ -13,7 +13,7 @@ struct MusicPlayerPopupApp: App {
 
     var body: some Scene {
         Settings {
-            SettingsView()
+            
         }
     }
 }
