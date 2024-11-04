@@ -207,18 +207,12 @@ struct Artwork: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 250)
         } else {
-            Placeholder()
+            Image(systemName: "photo")
+                .font(.system(size: 25))
+                .blendMode(.overlay)
+                .frame(width: 250, height: 250)
+                .background(.background.opacity(0.3))
         }
-    }
-}
-
-struct Placeholder: View {
-    var body: some View {
-        Image(systemName: "photo")
-            .font(.system(size: 25))
-            .blendMode(.overlay)
-            .frame(width: 250, height: 250)
-            .background(.background.opacity(0.3))
     }
 }
 
