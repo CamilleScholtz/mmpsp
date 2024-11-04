@@ -18,7 +18,7 @@ struct PopoverView: View {
 
     @State private var isHovering = false
     @State private var showInfo = false
-    
+
     @State private var cursorMonitor: Any?
     @State private var cursorPosition: CGPoint = .zero
 
@@ -32,17 +32,17 @@ struct PopoverView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Artwork(image: player.song.artwork ?? NSImage())
+            Artwork(image: player.song.artwork)
                 .overlay(
-                    Artwork(image: previousArtwork ?? NSImage())
-                        .opacity(isBackgroundArtworkTransitioning ? 1 : 0)
+                    previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
+                        .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
                 )
-                .opacity(0.25)
+                .opacity(0.3)
 
-            Artwork(image: player.song.artwork ?? NSImage())
+            Artwork(image: player.song.artwork)
                 .overlay(
-                    Artwork(image: previousArtwork ?? NSImage())
-                        .opacity(isArtworkTransitioning ? 1 : 0)
+                    previousArtwork != nil ? AnyView(Artwork(image: previousArtwork)
+                        .opacity(isArtworkTransitioning ? 1 : 0)) : AnyView(EmptyView())
                 )
                 .cornerRadius(10)
                 .rotation3DEffect(
@@ -84,7 +84,7 @@ struct PopoverView: View {
         )
         .frame(width: 250, height: height)
         .onReceive(willShowNotification) { _ in
-            Task(priority: .high) {
+            Task(priority: .userInitiated) {
                 await player.song.setArtwork()
             }
             Task {
@@ -104,7 +104,7 @@ struct PopoverView: View {
                 return
             }
 
-            Task(priority: .high) {
+            Task(priority: .userInitiated) {
                 await player.song.setArtwork()
             }
         }
@@ -198,13 +198,27 @@ struct PopoverView: View {
 }
 
 struct Artwork: View {
-    let image: NSImage
+    let image: NSImage?
 
     var body: some View {
-        Image(nsImage: image)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: 250)
+        if let image {
+            Image(nsImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 250)
+        } else {
+            Placeholder()
+        }
+    }
+}
+
+struct Placeholder: View {
+    var body: some View {
+        Image(systemName: "photo")
+            .font(.system(size: 25))
+            .blendMode(.overlay)
+            .frame(width: 250, height: 250)
+            .background(.background.opacity(0.3))
     }
 }
 
