@@ -97,7 +97,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             description = String(description.prefix(80)) + "…"
         }
 
-        statusItem.button!.title = description
+        if player.status.playState != MPD_STATE_STOP {
+            statusItem.button!.title = description
+        } else {
+            statusItem.button!.title = ""
+        }
     }
 
     private func togglePopover(_ sender: NSStatusBarButton?) {

@@ -297,6 +297,7 @@ class PlayerResponse {
 
         if update(&isPlaying, value: data.isPlaying) {
             AppDelegate.shared.setPopoverAnchorImage(changed: data.isPlaying ?? false ? "play" : "pause")
+            AppDelegate.shared.setStatusItemTitle()
         }
         if update(&isRandom, value: data.isRandom) {
             AppDelegate.shared.setPopoverAnchorImage(changed: data.isRandom ?? false ? "random" : "sequential")
