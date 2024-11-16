@@ -295,8 +295,23 @@ class PlayerResponse {
             return
         }
 
-        if update(&isPlaying, value: data.isPlaying) {
-            AppDelegate.shared.setPopoverAnchorImage(changed: data.isPlaying ?? false ? "play" : "pause")
+        if update(&playState, value: data.playState) {
+            var newImageName: String?
+
+            switch data.playState {
+            case MPD_STATE_STOP:
+                newImageName = "stop"
+            case MPD_STATE_PAUSE:
+                newImageName = "pause"
+            case MPD_STATE_PLAY:
+                newImageName = "play"
+            default:
+                break
+            }
+
+            if let newImageName {
+                AppDelegate.shared.setPopoverAnchorImage(changed: newImageName)
+            }
             AppDelegate.shared.setStatusItemTitle()
         }
         if update(&isRandom, value: data.isRandom) {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import libmpdclient
 
 @main
 struct MusicPlayerPopupApp: App {
@@ -69,6 +70,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popoverAnchor.button!.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: "play")
         case "pause":
             popoverAnchor.button!.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: "pause")
+        case "stop":
+            popoverAnchor.button!.image = NSImage(systemSymbolName: "stop.fill", accessibilityDescription: "stop")
         case "random":
             popoverAnchor.button!.image = NSImage(systemSymbolName: "shuffle", accessibilityDescription: "random")
         case "sequential":
