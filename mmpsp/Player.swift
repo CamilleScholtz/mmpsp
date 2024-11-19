@@ -183,19 +183,19 @@ actor ConnectionManager {
         return mpd_run_idle_mask(connection, mask)
     }
 
-    func getStatusData() -> (isPlaying: Bool?, isRandom: Bool?, isRepeat: Bool?, elapsed: Double?) {
+    func getStatusData() -> (playState: mpd_state?, isRandom: Bool?, isRepeat: Bool?, elapsed: Double?) {
         guard let connection, let recv = mpd_run_status(connection) else {
             return (nil, nil, nil, nil)
         }
 
-        let isPlaying = mpd_status_get_state(recv) == MPD_STATE_PLAY
+        let playState = mpd_status_get_state(recv)
         let isRandom = mpd_status_get_random(recv)
         let isRepeat = mpd_status_get_repeat(recv)
         let elapsed = Double(mpd_status_get_elapsed_time(recv))
 
         mpd_status_free(recv)
 
-        return (isPlaying, isRandom, isRepeat, elapsed)
+        return (playState, isRandom, isRepeat, elapsed)
     }
 
     func getSongData() -> (artist: String?, title: String?, location: String?, duration: Double?) {
@@ -278,7 +278,12 @@ class PlayerResponse {
 
 @Observable class Status: PlayerResponse {
     var elapsed: Double?
-    var isPlaying: Bool?
+
+    var playState: mpd_state?
+    var isPlaying: Bool {
+        playState == MPD_STATE_PLAY
+    }
+
     var isRandom: Bool?
     var isRepeat: Bool?
 
@@ -290,8 +295,24 @@ class PlayerResponse {
             return
         }
 
-        if update(&isPlaying, value: data.isPlaying) {
-            AppDelegate.shared.setPopoverAnchorImage(changed: data.isPlaying ?? false ? "play" : "pause")
+        if update(&playState, value: data.playState) {
+            var newImageName: String?
+
+            switch data.playState {
+            case MPD_STATE_STOP:
+                newImageName = "stop"
+            case MPD_STATE_PAUSE:
+                newImageName = "pause"
+            case MPD_STATE_PLAY:
+                newImageName = "play"
+            default:
+                break
+            }
+
+            if let newImageName {
+                AppDelegate.shared.setPopoverAnchorImage(changed: newImageName)
+            }
+            AppDelegate.shared.setStatusItemTitle()
         }
         if update(&isRandom, value: data.isRandom) {
             AppDelegate.shared.setPopoverAnchorImage(changed: data.isRandom ?? false ? "random" : "sequential")
