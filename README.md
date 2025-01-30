@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This project has moved to: https://github.com/CamilleScholtz/swmpc
+
 # mmpsp
 
 MacOS music player swift popover.
